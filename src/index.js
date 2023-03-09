@@ -4,7 +4,8 @@ import dotenv from 'dotenv'
 
 // routers
 import home from './routes/home';
-// import userRouter from './routes/api/users';
+import userRouter from './routes/api/users';
+import roleRouter from './routes/api/roles';
 // import registerRouter from './routes/register';
 import loginRouter from './routes/login';
 // import logoutRouter from './routes/logout';
@@ -27,9 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', home);
 
 // app.use('/api/auth/register', registerRouter);
-app.use('/api/auth/login', loginRouter);
+app.use('/api/v1/auth/login', loginRouter);
 // app.use('/api/auth/logout', logoutRouter);
-// app.use('/api/users', userRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/roles', roleRouter);
 // app.use(swaggerDocRouter);
 
 app.all('*', (req, res) => {

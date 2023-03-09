@@ -13,32 +13,32 @@ const handleLogin = async (req, res) => {
       .json({ message: 'Username and password are required.' });
   }
 
-  const foundUser = await User.find({ email }).exec();
-  if (!foundUser) return res.status(401).json({message : "user not registered"}); // Unauthorized
+  const user = await User.findOne({ where: { email } });
+  if (!user) return res.status(401).json({message : "user not registered"}); // Unauthorized
   // evaluate password
-  const match = await bcrypt.compare(password, foundUser.password);
-  if (match) {
-    const roles = Object.values(foundUser.roles).filter(Boolean);
+  const match = await bcrypt.compare(password, user.password);
+  if (match) {  
+
+    // const roles = Object.values(user.roles).filter(Boolean);
     // create JWTs
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          email: foundUser.email,
-          roles,
+          user: user,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '10m' },
+      { expiresIn: '1m' },
     );
 
     const refreshToken = jwt.sign(
-      { email: foundUser.email },
+      { user: user },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: '1d' },
     );
     // Saving refreshToken with current user
-    foundUser.refreshToken = refreshToken;
-    await foundUser.save();
+    user.refreshToken = refreshToken;
+    await user.save();
 
     // Creates Secure Cookie with refresh token
     res.cookie('jwt', refreshToken, {
@@ -49,7 +49,7 @@ const handleLogin = async (req, res) => {
     });
 
     // Send authorization roles and access token to user
-    return res.status(200).json({ roles,foundUser, accessToken, message: 'Loggin succesfull' });
+    return res.status(200).json({ user, accessToken, message: 'Loggin succesfull' });
   }
   return res.status(401).json({ message: 'Login failed' });
 };

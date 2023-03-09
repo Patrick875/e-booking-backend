@@ -5,8 +5,9 @@ import usersController from '../../controllers/usersController';
 
 const router = express.Router();
 
-router.route('/all').get(verfyJWT, usersController.getAllUsers)
+router.route('/all').get(usersController.getAllUsers)
+router.route('/add').post(usersController.createUser)
 router.route('/:id')
-  .get(verfyJWT, usersController.getUser);
+  .get(usersController.getUser);
 
 module.exports = router;
