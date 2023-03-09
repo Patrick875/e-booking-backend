@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  server:
+    container_name: e_book_backend
+    image: e_book_backend:0.0.1
+    build:
+      context: .
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      DEV_DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@db:${DB_PORT}/${DB_NAME}
+    networks:
+      - shared-network
+    volumes:
+      - .:/app
+      - /app/node_modules
+networks:
+  shared-network:

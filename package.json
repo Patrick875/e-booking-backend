@@ -1,0 +1,64 @@
+{
+  "name": "portfolio-backend",
+  "version": "1.0.0",
+  "description": "this is backend for my capstone project, this will allow visitors to reach me, it is a RESTfull API",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src -d dist",
+    "start": "node dist/index.js",
+    "dev": "nodemon --exec babel-node src/index.js",
+    "test": "NODE_ENV=test nyc --reporter=text --reporter=html --reporter=json-summary mocha --recursive --exit --timeout 2000000 --require @babel/register test/*.test.js",
+    "coverage": "nyc --reporter=html --report-dir=coverage/ npm run test",
+    "coverage:badge": "coverage-badge-creator"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aimeana100/portifolio-backend.git"
+  },
+  "author": "Anathole K.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aimeana100/portifolio-backend/issues"
+  },
+  "homepage": "https://github.com/Aimeana100/portifolio-backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "i18next": "^22.4.10",
+    "i18next-fs-backend": "^2.1.1",
+    "i18next-http-middleware": "^3.2.2",
+    "jsonwebtoken": "^9.0.0",
+    "nodemon": "^2.0.20",
+    "pg": "^8.9.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.29.1",
+    "sqlite3": "^5.1.4",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^4.6.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/node": "^7.20.7",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/register": "^7.18.9",
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "check-code-coverage": "^1.10.4",
+    "coverage-badge-creator": "^1.0.17",
+    "coveralls": "^3.1.1",
+    "eslint": "^8.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "mocha": "^10.2.0",
+    "mocha-junit-reporter": "^2.2.0",
+    "mocha-lcov-reporter": "^1.3.0",
+    "nodemon": "^2.0.20",
+    "nyc": "^15.1.0",
+    "sequelize-cli": "^6.6.0",
+    "supertest": "^6.3.3"
+  }
+}
