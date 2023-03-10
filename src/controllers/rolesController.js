@@ -1,5 +1,3 @@
-/* eslint-disable consistent-return */
-import bcrypt from "bcrypt";
 import { Role } from "../models";
 
 const getAllRoles = async (req, res) => {

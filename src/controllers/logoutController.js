@@ -1,4 +1,4 @@
-import User from '../models/User';
+import {User} from '../models';
 
 const handleLogout = async (req, res) => {
   // On client, also delete the accessToken
@@ -8,7 +8,7 @@ const handleLogout = async (req, res) => {
   const refreshToken = cookies.jwt;
 
   // Is refreshToken in db?
-  const foundUser = await User.findOne({ refreshToken }).exec();
+  const foundUser = await User.findOne({ refreshToken })
   if (!foundUser) {
     res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
     return res.sendStatus(204);

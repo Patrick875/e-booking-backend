@@ -22,10 +22,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
         references:{
-          model: 'RoomClasses',
+          model: 'RoomClass',
           key: 'id',
           onDelete: 'RESTRICT',
-          onUpdate: 'CASCADE'
+          onUpdate: 'CASCADE',
         }
         
 

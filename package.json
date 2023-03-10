@@ -7,6 +7,9 @@
     "build": "babel src -d dist",
     "start": "node dist/index.js",
     "dev": "nodemon --exec babel-node src/index.js",
+    "docker:compose:up": "docker-compose up -d",
+    "docker:compose:down": "docker-compose down",
+    "docker:compose:clean": "docker-compose down --volumes --rmi all --remove-orphans",
     "test": "NODE_ENV=test nyc --reporter=text --reporter=html --reporter=json-summary mocha --recursive --exit --timeout 2000000 --require @babel/register test/*.test.js",
     "coverage": "nyc --reporter=html --report-dir=coverage/ npm run test",
     "coverage:badge": "coverage-badge-creator"

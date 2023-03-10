@@ -9,17 +9,17 @@ const env = process.env.NODE_ENV;
 const db = {};
 let sequelize;
 
-// if (config[env].url) {
-//   sequelize = new Sequelize(config[env].url);
-// } else {
-//   sequelize = new Sequelize(process.env.DEV_DATABASE_URL);
-// }
+if (config[env].url) {
+  sequelize = new Sequelize(config[env].url);
+} else {
+  sequelize = new Sequelize(process.env.DEV_DATABASE_URL);
+}
 
 // Option 2: Passing parameters separately (sqlite)
-sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: '../database/database.sqlite'
-});
+// sequelize = new Sequelize({
+//   dialect: 'sqlite',
+//   storage: '../database/database.sqlite'
+// });
 
 fs.readdirSync(__dirname)
   .filter((file) => {

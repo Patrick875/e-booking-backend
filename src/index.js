@@ -6,9 +6,10 @@ import dotenv from 'dotenv'
 import home from './routes/home';
 import userRouter from './routes/api/users';
 import roleRouter from './routes/api/roles';
-// import registerRouter from './routes/register';
+import roomClass from './routes/api/roomClass';
+import room from './routes/api/room';
 import loginRouter from './routes/login';
-// import logoutRouter from './routes/logout';
+import logoutRouter from './routes/logout';
 // import {swaggerDocRouter} from './docs';
 import db from "./models/index";
 
@@ -27,9 +28,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/', home);
 
-// app.use('/api/auth/register', registerRouter);
+app.use('/api/v1/roomclass', roomClass);
+app.use('/api/v1/room', room);
 app.use('/api/v1/auth/login', loginRouter);
-// app.use('/api/auth/logout', logoutRouter);
+app.use('/api/auth/logout', logoutRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/roles', roleRouter);
 // app.use(swaggerDocRouter);

@@ -15,5 +15,23 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    depends_on:
+      - db
+
+  db:
+    container_name: postgres_db
+    image: "postgres"
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      - shared-network
+    volumes:
+      - nps_data:/var/lib/postgresql/data
+volumes:
+  nps_data:
 networks:
   shared-network:
