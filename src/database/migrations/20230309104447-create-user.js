@@ -40,7 +40,7 @@ module.exports = {
         references: {
           model: 'Role',
           key: 'id',
-          onDelete: 'CASCADE', // add cascade on delete
+          onDelete: 'RESTRICT',
           onUpdate: 'CASCADE',
         },
       },

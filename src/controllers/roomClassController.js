@@ -1,42 +1,36 @@
-import { User } from "../models";
-import { Role } from "../models";
+import { RoomClass } from "../models";
+import { Room } from "../models";
 
-const getAllUsers = async (req, res) => {
-  const users = await User.findAll({});
-  res.status(200).json({ message: "ok", users });
+const getAllRoomClasses = async (req, res) => {
+  const data = await User.findAll({include: RoomClass});
+  res.status(200).json({ message: "ok", data });
 };
 
-const getUser = async (req, res) => {
-  const user = await User.findByPk(req.params.id);
-  if (!user) {
+const getRoomClass = async (req, res) => {
+  const data = await User.findByPk(req.params.id);
+  if (!data) {
     return res
       .status(204)
-      .json({ message: `User with id : ${req.params.id} does not exist` });
+      .json({ message: `Room class with id does not exist` });
   }
-  res.status(200).json(user);
+  res.status(200).json({message : "ok", data});
 };
 
-const createUser = async (req, res) => {
+const createRoomClass = async (req, res) => {
   if (
-    !req.body.firstName ||
-    !req.body.lastName ||
-    !req.body.email ||
-    !req.body.phone
+    !req.body.name 
   ) {
     return res
       .status(400)
       .json({ message: "Please provide all required information" });
   }
 
-  req.body["password"] = await bcrypt.hash("12345678", 10);
-  req.body["roleId"] = req.body?.role ? req.body.role : 1;
-
-  const user = await User.create(req.body);
-  return res.status(201).json({ message: "ok", user });
+  const data = await RoomClass.create(req.body);
+  return res.status(201).json({ message: "ok", data });
 };
 
 export default {
-  getAllUsers,
-  getUser,
-  createUser,
+  getAllRoomClasses,
+  getRoomClass,
+  createRoomClass,
 };

@@ -4,7 +4,7 @@ import { User } from "../models";
 import { Role } from "../models";
 
 const getAllUsers = async (req, res) => {
-  const users = await User.findAll({});
+  const users = await User.findAll({include:  Role});
   res.status(200).json({ message: "ok", users });
 };
 
