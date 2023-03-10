@@ -33,6 +33,11 @@ const createUser = async (req, res) => {
   req.body["password"] = await bcrypt.hash("12345678", 10);
   req.body["roleId"] = req.body?.role ? req.body.role : 1;
 
+  const role = await Role.findByPk(req.body?.roleId);
+  if(!role) {
+    return re.status(400).json({ message: "Role does not exist" });
+  }
+
   const user = await User.create(req.body);
   return res.status(201).json({ message: "ok", user });
 };

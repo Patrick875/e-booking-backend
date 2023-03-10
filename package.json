@@ -1,5 +1,5 @@
 {
-  "name": "portfolio-backend",
+  "name": "ebooking-app",
   "version": "1.0.0",
   "description": "this is backend for my capstone project, this will allow visitors to reach me, it is a RESTfull API",
   "main": "index.js",
