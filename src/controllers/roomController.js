@@ -1,5 +1,4 @@
-import { Room } from "../models";
-import { RoomClass } from "../models";
+import { Room, RoomClass } from "../models";
 
 const getAllRoom = async (req, res) => {
   const data = await Room.findAll({ include: RoomClass });
@@ -13,7 +12,7 @@ const getRoom = async (req, res) => {
   if (!data) {
     return res
       .status(204)
-      .json({ message: `Room class with id does not exist`, data});
+      .json({ message: `Room class with id does not exist`, data });
   }
   res.status(200).json({ message: "ok", data });
 };
@@ -36,8 +35,46 @@ const createRoom = async (req, res) => {
   return res.status(201).json({ message: "ok", data });
 };
 
+const deleteRoom = async (req, res) => {
+  if (!req.params.id)
+    return res.status(400).json({ status: "error", message: "bad request" });
+
+  const room = await Room.findByPk(req.params.id);
+
+  if (!room)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Room does not exist" });
+
+  await room.destroy();
+  return res
+    .status(200)
+    .json({ status: "ok", message: "Room deleted successfully" });
+};
+
+const updateRoom = async (req, res) => {
+  if (!req.body.id)
+    return res.status(400).json({ status: "error", message: "bad request" });
+
+  const room = await Room.findByPk(req.body.id);
+
+  if (!room)
+    return res
+      .status(400)
+      .json({ status: "error", message: "Room does not exist" });
+
+  room.set(req.body);
+  await room.save();
+
+  return res
+    .status(200)
+    .json({ status: "ok", message: "Room updated successfully" });
+};
+
 export default {
   getAllRoom,
   getRoom,
   createRoom,
+  updateRoom,
+  deleteRoom,
 };

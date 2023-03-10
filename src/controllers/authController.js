@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {User} from '../models';
+import {Role} from '../models';
 
 import dotenv from 'dotenv'
 dotenv.config()
@@ -13,7 +14,12 @@ const handleLogin = async (req, res) => {
       .json({ message: 'Username and password are required.' });
   }
 
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email },
+    include: {
+    model: Role,
+    as: 'Role'
+  } });
+  
   if (!user) return res.status(401).json({message : "user not registered"}); // Unauthorized
   // evaluate password
   const match = await bcrypt.compare(password, user.password);
@@ -30,10 +36,11 @@ const handleLogin = async (req, res) => {
     );
 
     const refreshToken = jwt.sign(
-      { user: user },
+      { user},
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: '1d' },
     );
+
     // Saving refreshToken with current user
     user.refreshToken = refreshToken;
     await user.save();
