@@ -12,12 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Package.belongsToMany(models.Product, {through: models.ProductPackage})
-
+      Package.belongsTo(models.ProductCategory , {foreignKey: 'categoryId'})
     }
   }
   Package.init({
     name: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    categoryId:DataTypes.INTEGER
+    
   }, {
     sequelize,
     modelName: 'Package',

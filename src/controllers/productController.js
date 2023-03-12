@@ -1,39 +1,32 @@
 import { Product, Package, ProductCategory, ProductPackage } from "../models";
 
 const CreateProduct = async (req, res) => {
-  if (!req.body?.name || !req.body?.category) {
+  if (!req.body?.name) {
     return res
       .status(400)
       .json({ status: "error", message: "name and Category is required" });
   }
 
-  const category = await ProductCategory.findByPk(req.body.category);
-
-  if (!category)
-    return res
-      .status(404)
-      .json({ status: "error", message: "Category not found" });
-
-  // return res.status(200).json( { status: "success", data:  req.body.package_1 } );
-
   const product = await Product.create({
     name: req.body.name,
-    product_categoryId: req.body.category,
   });
 
   Object.keys(req.body).forEach(async (key, val) => {
     let packages = {};
     if (key.startsWith("package_")) {
-      packages.packageId = Number(key.split("_")[1]);
-      packages.productId = product.id;
+      packages.PackageId = Number(key.split("_")[1]);
+      packages.ProductId = product.id;
       packages.price = req.body[key];
 
-      let pkg = await Package.findByPk(packages.packageId);
+      console.log(packages);
+
+      let pkg = await Package.findByPk(Number(key.split("_")[1]));
       if (pkg) {
         await ProductPackage.create(packages);
+        await product.destroy();
       }
     }
-  }); 
+  });
 
   return res.status(200).json({ status: "ok", data: product });
 };
@@ -53,9 +46,6 @@ const UpdateProduct = (req, res) => {
 
   Product.set({
     name: req.body.name ? req.body.name : product.name,
-    product_categoryId: req.body.category
-      ? req.body.category
-      : product.category,
   });
 };
 
@@ -78,9 +68,9 @@ const DeleteProduct = async (req, res) => {
 };
 
 const GetAllProducts = async (req, res) => {
-  const products = await Product.findAll({
-    include: [Package, ProductCategory],
-  });
+  const products = await Product.findAll(
+    { order: [["id", "DESC"]], include: [Package]  }
+  );
   return res.status(200).json({ status: "ok", data: products });
 };
 

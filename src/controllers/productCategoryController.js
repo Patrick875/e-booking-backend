@@ -1,4 +1,4 @@
-import { ProductCategory, Product } from "../models";
+import { ProductCategory, Package } from "../models";
 
 const CreateProductCategory = async (req, res) => {
   if (!req.body?.name) {
@@ -54,7 +54,7 @@ const GetProductCategory = async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Invalid request" });
   }
-  const category = await ProductCategory.findByPk(req.params.id,{include: [{model: Product}]});
+  const category = await ProductCategory.findByPk(req.params.id,{include: [{model: Package}]});
   if (!category)
     return res
       .status(400)
@@ -64,7 +64,7 @@ const GetProductCategory = async (req, res) => {
 };
 
 const GetProductCategories = async (req, res) => {
-  const categories = await ProductCategory.findAll({include: [{model: Product}]});
+  const categories = await ProductCategory.findAll({include: [{model: Package}]});
   return res.status(200).json({ status: "ok", data: categories });
 };
 

@@ -1,13 +1,23 @@
-import { Package, Product } from "../models";
+import { Package, Product, ProductCategory } from "../models";
 
 const CreatePackage = async (req, res) => {
-  if (!req.body.name) {
+  if (!req.body.name || !req.body.category) {
     return res
       .status(400)
       .json({ status: "error", message: "Package name is required" });
   }
 
-  const result = await Package.create(req.body);
+  const category = await ProductCategory.findByPk(req.body.category);
+  if (!category) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Category does not exist" });
+  }
+
+  const result = await Package.create({
+    ...req.body,
+    categoryId: req.body.category,
+  });
   return res.status(201).json({
     status: "ok",
     message: "package created successfully",
@@ -29,9 +39,16 @@ const UpdatePackage = async (req, res) => {
       message: "Package with id '" + req.body.id + "' not found",
     });
 
-  packages.set(req.body);
+  packages.set({
+    ...req.body,
+    categoryId: req.body?.category ? req.body.category : packages.categoryId,
+  });
   await packages.save();
-  return res.status(200).json({status: "ok", message: "package updated successfully", data: packages});
+  return res.status(200).json({
+    status: "ok",
+    message: "package updated successfully",
+    data: packages,
+  });
 };
 
 const DeletePackage = async (req, res) => {
@@ -63,12 +80,17 @@ const GetPackage = async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Package id is required" });
   }
-  const packages = await Package.findByPk( req.params.id, { include: [Product] });
+  const packages = await Package.findByPk(req.params.id, {
+    include: [Product, ProductCategory],
+  });
   return res.status(200).json({ status: "ok", data: packages });
 };
 
 const GetPackages = async (req, res) => {
-  const packages = await Package.findAll({ include: [Product] });
+  const packages = await Package.findAll({
+    order: [["id", "DESC"]],
+    include: [Product, ProductCategory],
+  });
   return res.status(200).json({ status: "ok", data: packages });
 };
 

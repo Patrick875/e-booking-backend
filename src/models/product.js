@@ -12,12 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Product.belongsToMany(models.Package, {through: models.ProductPackage})
-      Product.belongsTo(models.ProductCategory, {foreignKey: 'product_categoryId'})
     }
   }
   Product.init({
     name: DataTypes.STRING,
-    product_categoryId: DataTypes.INTEGER,
     status: DataTypes.BOOLEAN
   }, {
     sequelize,
@@ -25,4 +23,4 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'Products'
   });
   return Product;
-};
+}; 
