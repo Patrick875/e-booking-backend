@@ -4,6 +4,7 @@ import {User} from '../models';
 import {Role} from '../models';
 
 import dotenv from 'dotenv'
+
 dotenv.config()
 
 const handleLogin = async (req, res) => {

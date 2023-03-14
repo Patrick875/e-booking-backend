@@ -14,8 +14,12 @@ import productRouter from './routes/api/product';
 import serviceCategoryRouter from './routes/api/serviceCategory';
 import serviceRouter from './routes/api/services';
 import packagesRouter from './routes/api/packages';
+import stockItemRoutter from './routes/api/stockItems';
+
+
 import loginRouter from './routes/login';
 import logoutRouter from './routes/logout';
+
 // import {swaggerDocRouter} from './docs';
 import db from "./models/index";
 
@@ -42,6 +46,7 @@ app.use('/api/v1/products', productRouter);
 app.use('/api/v1/services/category', serviceCategoryRouter);
 app.use('/api/v1/services', serviceRouter);
 app.use('/api/v1/packages', packagesRouter);
+app.use('/api/v1/stock/item', stockItemRoutter);
 
 app.use('/api/v1/login', loginRouter);
 app.use('/api/logout', logoutRouter);
