@@ -4,7 +4,7 @@ const CreatePackage = async (req, res) => {
   if (!req.body.name || !req.body.category) {
     return res
       .status(400)
-      .json({ status: "error", message: "Package name is required" });
+      .json({ status: "error", message: "Package name and category is required" });
   }
 
   const category = await ProductCategory.findByPk(req.body.category);

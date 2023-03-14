@@ -2,29 +2,38 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('StockTransactions', {
+    await queryInterface.createTable('StockTransactionDetails', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      transaction_date: {
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        type: Sequelize.DATE
-      },
-      userId: {
+      stockTransactionId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
-        model: 'Users', 
-        key: 'id' },
+          model: 'StockTransactions',
+          key: 'id',
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE'
+        }
+      },
+      stockItemId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      references: {
+        model: 'StockItems',
+        key: 'id',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
+      }
       },
-      status: {
-        allowNul: false,
-        type: Sequelize.ENUM('STOCK_IN', 'STOCK_OUT')
+      currentQuantity: {
+        type: Sequelize.INTEGER
+      },
+      transactionQuantity: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -37,6 +46,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('StockTransactions');
+    await queryInterface.dropTable('StockTransactionDetails');
   }
 };

@@ -23,7 +23,10 @@ const CreateProduct = async (req, res) => {
       let pkg = await Package.findByPk(Number(key.split("_")[1]));
       if (pkg) {
         await ProductPackage.create(packages);
+      }
+      else{
         await product.destroy();
+
       }
     }
   });
