@@ -24,10 +24,6 @@ const CreateProduct = async (req, res) => {
       if (pkg) {
         await ProductPackage.create(packages);
       }
-      else{
-        await product.destroy();
-
-      }
     }
   });
 

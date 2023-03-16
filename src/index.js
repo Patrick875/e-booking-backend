@@ -9,6 +9,7 @@ import roleRouter from './routes/api/roles';
 import roomClass from './routes/api/roomClass';
 import room from './routes/api/room';
 import reservationRouter from './routes/api/reservation';
+import customersRouter from './routes/api/customer'
 import productCategoryRouter from './routes/api/productCategory';
 import productRouter from './routes/api/product';
 import serviceCategoryRouter from './routes/api/serviceCategory';
@@ -38,6 +39,7 @@ app.use('/', home);
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);
+app.use('/api/v1/customers', customersRouter);
 app.use('/api/v1/reservation', reservationRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/roles', roleRouter);

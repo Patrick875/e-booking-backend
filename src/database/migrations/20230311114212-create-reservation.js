@@ -21,13 +21,31 @@ module.exports = {
         defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
         type: Sequelize.DATE,
       },
-
-      payment_mode: {
+      payment_status: {
         type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "PENDING",
+      },
+      adults_number: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      children_number: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       status: {
-        defaultValue: "in",
+        defaultValue: "INROOM",
         type: Sequelize.STRING,
+      },
+      booking_type: {
+        type: Sequelize.ENUM("ROOM", "HALL"),
+        defaultValue: "ROOM",
+        allowNull: false,
+      },
+      amount: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false,
       },
       customerId: {
         allowNull: false,
@@ -48,6 +66,26 @@ module.exports = {
           onDelete: "RESTRICT",
           onUpdate: "CASCADE",
         },
+      },
+      hallId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Hall",
+          key: "id",
+          onDelete: "RESTRICT",
+          onUpdate: "CASCADE",
+        },
+      },
+      userId: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references: {
+          model: "User",
+          key: "id",
+          onDelete: "RESTRICT",
+          onUpdate: "CASCADE",
+        }
       },
       createdAt: {
         allowNull: false,

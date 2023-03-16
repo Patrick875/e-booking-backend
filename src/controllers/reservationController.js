@@ -1,55 +1,59 @@
-import { Reservation, Customer } from "../models";
+import { Reservation, Customer, Room, Hall } from "../models";
 
 const AllReservations = async (req, res) => {
-    const data = await Reservation.findAll({include: [Customer]});
+  const data = await Reservation.findAll({ include: [Customer, Room, Hall] });
 
-    if(data.length === 0){
-        return res.status(404).json({message: 'No reservations found'});
-    }
-    return res.status(200).json({ status: "ok", data});
-}
+  if (data.length === 0) {
+    return res.status(404).json({ message: "No reservations found" });
+  }
+  return res.status(200).json({ status: "ok", data });
+};
 
 const CreateReservation = async (req, res) => {
-  const {
-    room,
-    firstname,
-    lastname,
-    email,
-    phone,
-    booking_date,
-    checkIn,
-    checkOut,
-    payment_mode,
-    status,
-  } = req.body;
+  const validationArr = ["checkIn", "checkOut", "booking_type", "customerId"];
+  let errors;
+  let is_valid = true;
 
-  if (
-    (!firstname && !lastname) ||
-    !email ||
-    !booking_date ||
-    !checkIn ||
-    !checkOut ||
-    !room
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
+  validationArr.forEach((item) => {
+    if (!req.body[item]) {
+      errors += item;
+    }
+  });
+
+  if (!is_valid) {
+    return res.status(400).json({ error: `${errors} are required` });
   }
 
-  const customer = await Customer.create({ firstname, lastname, email, phone });
-  const reservation = await Reservation.create({
-    roomId: room,
-    customerId: customer.id,
-    booking_date,
-    checkIn,
-    checkOut,
-    payment_mode,
-    status,
-  });
+  if (!req.body.roomId && !req.body.hallId) {
+    return res
+      .status(400)
+      .json({ error: "roomId and hallId can't both be empty" });
+  }
 
-  const data = await Reservation.findByPk(reservation.id, {
-    include: [{ model: Customer }],
-  });
+  if (req.body?.roomId) {
+    const room = await Room.findByPk(req.body.roomId);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+  }
+  if (req.body?.hallId) {
+    const hall = await Hall.findByPk(req.body.hallId);
+    if (!hall) {
+      return res.status(404).json({ error: "Hall not found" });
+    }
+  }
 
-  return res.status(201).json({ status: "ok", data });
+  try {
+    const reservation = await Reservation.create(req.body);
+
+    const data = await Reservation.findByPk(reservation.id, {
+      include: [{ model: [Customer, Room, Hall] }],
+    });
+
+    return res.status(201).json({ status: "ok", data });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 };
 
 const GetReservation = async (req, res) => {
@@ -81,25 +85,27 @@ const UpdateReservation = async (req, res) => {
   reservation.set(req.body);
   await reservation.save();
 
+  return res.status(200).json({ status: "ok", data: reservation });
 };
 
 const ChechOutReservation = async (req, res) => {
+  if (!req.params.id) return res.status(400).json({ error: "id is required" });
 
-    if(!req.params.id) return res.status(400).json({ error: "id is required" });
+  const reservation = await Reservation.findByPk(req.params.id);
+  if (!reservation)
+    return res
+      .status(404)
+      .json({ status: "error", message: "Reservation not found" });
 
-    const reservation = await Reservation.findByPk(req.params.id);
-    if(!reservation) return res.status(404).json({ status: "error", message: "Reservation not found" });
+  reservation.update({ status: "out" });
 
-    reservation.update({status : "out"});
-
-    return res.status(200).json({ status: "ok", data: reservation });
-
-}
+  return res.status(200).json({ status: "ok", data: reservation });
+};
 
 export default {
-    AllReservations,
-    CreateReservation,
-    UpdateReservation,
-    ChechOutReservation,
-    GetReservation,
-}
+  AllReservations,
+  CreateReservation,
+  UpdateReservation,
+  ChechOutReservation,
+  GetReservation,
+};

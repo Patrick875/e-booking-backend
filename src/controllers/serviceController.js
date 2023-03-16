@@ -8,20 +8,27 @@ const CreateService = async (req, res) => {
         .json({ status: "error", message: "Name and Category is required" });
     }
   
-    const category = await ServiceCategory.findByPk(req.body.category);
+    const category = await ServiceCategory.findByPk(req.body.category, { include: [{model: Service}] });
+
+    console.log(category, req.body.category)
   
     if (!category)
       return res
         .status(404)
         .json({ status: "error", message: "Category not found" });
   
+    try {
+      const service = await Service.create({
+        name: req.body.name,
+        service_categoryId: req.body.category,
+        price: req.body.price,
+      });
+      return res.status(200).json({ status: "ok", data: service });
+
+    } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message})
+    }
   
-    const service = await Service.create({
-      name: req.body.name,
-      service_categiryId: req.body.category,
-    });
-  
-    return res.status(200).json({ status: "ok", data: service });
   };
   
   const UpdateService = (req, res) => {
@@ -38,11 +45,18 @@ const CreateService = async (req, res) => {
         .json({ status: "error", message: "Service not found" });
   
     Service.set({
-      name: req.body.name ? req.body.name : Service.name,
-      service_categiryId: req.body.category
+      name: req.body.name ? req.body.name : service.name,
+      service_categoryId: req.body.category
         ? req.body.category
         : Service.category,
+        price: req.body.price ? req.body.price : service.price,
     });
+
+    try {
+      
+    } catch (error) {
+      
+    }
   };
   
   const DeleteService = async (req, res) => {
