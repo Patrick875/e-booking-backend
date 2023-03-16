@@ -1,7 +1,7 @@
 import { Customer, Reservation } from "../models";
 
 const CreateCustomer = async (req, res) => {
-  let erro = '';
+  let error = '';
   let is_valid = true;
   const validationArr = [
     "names",
@@ -18,7 +18,7 @@ const CreateCustomer = async (req, res) => {
       is_valid = false;
     }
   });
-
+ 
 
 
   if (!is_valid) {
