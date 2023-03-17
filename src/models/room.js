@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Room.belongsTo(models.RoomClass, { foreignKey: 'roomClassId'});
+      Room.hasMany(models.Reservation, { foreignKey: 'roomId'});
     }
   }
   Room.init({

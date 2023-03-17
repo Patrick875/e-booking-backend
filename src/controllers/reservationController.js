@@ -3,9 +3,6 @@ import { Reservation, Customer, Room, Hall } from "../models";
 const AllReservations = async (req, res) => {
   const data = await Reservation.findAll({ include: [Customer, Room, Hall] });
 
-  if (data.length === 0) {
-    return res.status(404).json({ message: "No reservations found" });
-  }
   return res.status(200).json({ status: "ok", data });
 };
 
@@ -47,7 +44,7 @@ const CreateReservation = async (req, res) => {
     const reservation = await Reservation.create(req.body);
 
     const data = await Reservation.findByPk(reservation.id, {
-      include: [{ model: [Customer, Room, Hall] }],
+      include: [Customer, Room, Hall],
     });
 
     return res.status(201).json({ status: "ok", data });

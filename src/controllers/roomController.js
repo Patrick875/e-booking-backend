@@ -1,7 +1,7 @@
-import { Room, RoomClass } from "../models";
+import { Room, RoomClass, Reservation } from "../models";
 
 const getAllRoom = async (req, res) => {
-  const data = await Room.findAll({ include: RoomClass });
+  const data = await Room.findAll({ include: [RoomClass, Reservation] });
   res.status(200).json({ message: "ok", data });
 };
 

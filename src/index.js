@@ -16,6 +16,7 @@ import serviceCategoryRouter from './routes/api/serviceCategory';
 import serviceRouter from './routes/api/services';
 import packagesRouter from './routes/api/packages';
 import stockItemRoutter from './routes/api/stockItems';
+import hallRouter  from './routes/api/halls';
 
 
 import loginRouter from './routes/login';
@@ -39,6 +40,7 @@ app.use('/', home);
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);
+app.use('/api/v1/halls', hallRouter)
 app.use('/api/v1/customers', customersRouter);
 app.use('/api/v1/reservation', reservationRouter);
 app.use('/api/v1/users', userRouter);
