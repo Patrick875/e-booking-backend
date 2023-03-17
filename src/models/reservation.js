@@ -24,6 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     hallId:DataTypes.INTEGER,
     customerId: DataTypes.INTEGER,
     userId: DataTypes.INTEGER,
+    amount: DataTypes.DECIMAL(10, 2),
+    payment: DataTypes.INTEGER,
     booking_date: DataTypes.DATE,
     payment_status: DataTypes.STRING,
     adults_number:DataTypes.INTEGER,
