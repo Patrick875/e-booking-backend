@@ -1,7 +1,7 @@
-import { Reservation, Customer, Room, Hall } from "../models";
+import { Reservation, Customer, Room, Hall, User } from "../models";
 
 const AllReservations = async (req, res) => {
-  const data = await Reservation.findAll({ include: [Customer, Room, Hall] });
+  const data = await Reservation.findAll({ include: [Customer, Room, Hall, User] });
 
   return res.status(200).json({ status: "ok", data });
 };
@@ -44,7 +44,7 @@ const CreateReservation = async (req, res) => {
     const reservation = await Reservation.create(req.body);
 
     const data = await Reservation.findByPk(reservation.id, {
-      include: [Customer, Room, Hall],
+      include: [Customer, Room, Hall, User],
     });
 
     return res.status(201).json({ status: "ok", data });
