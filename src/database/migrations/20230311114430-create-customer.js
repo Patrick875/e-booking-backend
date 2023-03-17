@@ -23,8 +23,13 @@ module.exports = {
       },
       gender:{
         allowNull: true,
-        typeof: Sequelize.STRING,
+        type: Sequelize.STRING,
       },
+      identification: {
+        allowNull: false,
+        type: Sequelize.STRING
+      }
+      ,
       nationality: {
         allowNull: false,
         type: Sequelize.STRING,

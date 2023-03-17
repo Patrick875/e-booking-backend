@@ -19,11 +19,13 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     phone: DataTypes.STRING,
     gender: DataTypes.STRING,
+    identification: DataTypes.STRING,
     status: DataTypes.STRING,
     customerType: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Customer',
+    tableName: 'Customers',
   });
   return Customer;
 };
