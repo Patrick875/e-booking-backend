@@ -1,7 +1,26 @@
 import { Room, RoomClass, Reservation } from "../models";
 
 const getAllRoom = async (req, res) => {
-  const data = await Room.findAll({ include: [RoomClass, Reservation] });
+  let data = await Room.findAll({
+    include: [
+      { model: RoomClass, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      {
+        model: Reservation,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+        order: [['dueDate', 'ASC']],
+        onAfterFind: (tasks,options) => {
+          
+        }
+      },
+      
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt","roomClassId"] },
+  });
+
+  // data = data.map((item) => {
+  //   return {...item, book_date: { checkIn : item.Reservations.checkIn, checkOut : item.Reservations.checkOut }}
+  // })
+
   res.status(200).json({ message: "ok", data });
 };
 
