@@ -17,6 +17,7 @@ import serviceRouter from './routes/api/services';
 import packagesRouter from './routes/api/packages';
 import stockItemRoutter from './routes/api/stockItems';
 import hallRouter  from './routes/api/halls';
+import hallService from './routes/api/hallServices'
 
 
 import loginRouter from './routes/login';
@@ -51,6 +52,7 @@ app.use('/api/v1/services/category', serviceCategoryRouter);
 app.use('/api/v1/services', serviceRouter);
 app.use('/api/v1/packages', packagesRouter);
 app.use('/api/v1/stock/item', stockItemRoutter);
+app.use('/api/v1/hall/services', hallService);
 
 app.use('/api/v1/login', loginRouter);
 app.use('/api/logout', logoutRouter);
