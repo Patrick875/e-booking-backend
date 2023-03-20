@@ -68,8 +68,15 @@ const DeleteHallService = async (req, res) => {
 };
 
 const GetAllService = async (req, res) => {
-  const hallServices = await HallService.findAll({ include: [Hall] });
-  return res.status(200).json({ status: `ok`, data: hallServices });
+  try {
+    const hallServices = await HallService.findAll({
+      include: [{model : Hall, attributes: {exclude: ['createdAt', 'updatedAt']}}],
+      attributes: {exclude: ['createdAt', 'updatedAt']}
+    });
+    return res.status(200).json({ status: `ok`, data: hallServices });
+  } catch (error) {
+    return res.status(500).json({ status: `error`, message: error.message });
+  }
 };
 
 export default {

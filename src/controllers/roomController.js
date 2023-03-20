@@ -17,7 +17,7 @@ const getAllRoom = async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt","roomClassId"] },
   });
 
-  data = data.map((item, index, arrayColl) => {
+  let newdata = data.map((item, index, arrayColl) => {
 
     arrayColl['book_date'] = item.Reservations
     return ;
@@ -28,9 +28,31 @@ const getAllRoom = async (req, res) => {
 };
 
 const getRoom = async (req, res) => {
+
+  if(isNaN(req.params.id)){
+
+    return res.status(400).json({ status: "error", message : "Invalid id" });
+  }
+
   if (!req.params.id) return res.status(400).json({ message: "bad request" });
 
-  const data = await Room.findByPk(req.params.id);
+  const data = await Room.findByPk(req.params.id,{
+
+    attributes: { exclude: ["createdAt", "updatedAt", "roomClassId"] },
+    include: [
+      {
+        model: Reservation,
+        attributes: ["checkIn", "checkOut"],
+        order: [['dueDate', 'ASC']],
+        where: {
+          
+        },
+        onAfterFind: (tasks,options) => {
+          
+        }
+      },
+      
+    ]});
   if (!data) {
     return res
       .status(204)

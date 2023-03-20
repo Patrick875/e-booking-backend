@@ -37,6 +37,22 @@ const DeleteHall = async (req, res) => {
     }
 }
 
+const SingleHall =  async (req, res) => {
+    if(!req.params?.id || isNaN(req.param?.id)){
+        return res.status(400).json({ status: `error`, message: 'Hall id is required and should be a number' })
+    }
+
+    try {
+        const hall = await Hall.findByPk(req.params.id,{include: [Reservation, {exclude: ['createAt', 'updateAt']}]})
+
+        return res.status(200).json({status: `ok`, data: hall})
+        
+    } catch (error) {
+        return res.status(500).json({status: `error`, error: error.message})
+    }
+    
+}
+
 const AllHalls = async (req, res) => {
     try {
        const halls = await Hall.findAll({include: [Reservation]})
@@ -49,4 +65,4 @@ const AllHalls = async (req, res) => {
     }
 }
 
-export default { CreateHall, UpdateHall, DeleteHall, AllHalls }
+export default { CreateHall, UpdateHall, DeleteHall, AllHalls, SingleHall }
