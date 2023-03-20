@@ -17,9 +17,12 @@ const getAllRoom = async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt","roomClassId"] },
   });
 
-  // data = data.map((item) => {
-  //   return {...item, book_date: { checkIn : item.Reservations.checkIn, checkOut : item.Reservations.checkOut }}
-  // })
+  data = data.map((item, index, arrayColl) => {
+
+    arrayColl['book_date'] = item.Reservations
+    return ;
+    // return {...item, book_date: { checkIn : item.Reservations.checkIn, checkOut : item.Reservations.checkOut }}
+  })
 
   res.status(200).json({ message: "ok", data });
 };

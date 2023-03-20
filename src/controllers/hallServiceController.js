@@ -7,8 +7,8 @@ const CreateHallService = async (req, res) => {
       .json({ status: `error`, message: `name and price are required` });
   }
   try {
-    const hall = await Hall.create(req.body);
-    return res.status(200).json({ status: `success`, data: hall });
+    const hall = await HallService.create(req.body);
+    return res.status(200).json({ status: `ok`, data: hall });
   } catch (err) {
     return res.status(500).json({ status: `error`, message: err.message });
   }
