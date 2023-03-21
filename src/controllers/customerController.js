@@ -99,14 +99,14 @@ const GetAllCustomers = async (req, res) => {
 
                 }
               ],
-              attributes: { exclude: ["createdAt", "updatedAt"] },
+              attributes: { exclude: ["createdAt", "updatedAt", "roomClassId"] },
             },
             {
               model: Hall,
               attributes: { exclude: ["createdAt", "updatedAt"] },
             },
           ],
-          attributes: { exclude: ["createdAt", "updatedAt"] },
+          attributes: { exclude: ["createdAt", "updatedAt","roomId", "customerId","hallId"] },
         },
       ],
       attributes: { exclude: ["createdAt", "updatedAt"] },

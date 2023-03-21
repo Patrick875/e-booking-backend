@@ -1,5 +1,5 @@
 import express from 'express';
-import roomController from '../../controllers/roomController';
+import roomController from '../../controllers/rooms/roomController';
 
 const routes = express.Router();
 

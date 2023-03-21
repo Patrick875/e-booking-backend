@@ -1,5 +1,5 @@
 import express from 'express';
-import productCategoryController from '../../controllers/productCategoryController';
+import productCategoryController from '../../controllers/products/productCategoryController';
 
 const routes = express.Router();
 

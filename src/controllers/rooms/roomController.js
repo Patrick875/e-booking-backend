@@ -1,4 +1,4 @@
-import { Room, RoomClass, Reservation } from "../models";
+import { Room, RoomClass, Reservation } from "../../models";
 
 const getAllRoom = async (req, res) => {
   let data = await Room.findAll({
@@ -28,6 +28,10 @@ const getAllRoom = async (req, res) => {
 };
 
 const getRoom = async (req, res) => {
+
+  if(!req.params.id){
+    return res.status(404).json({status: 'error', message: 'Id is required'});
+  }
 
   if(isNaN(req.params.id)){
 

@@ -1,4 +1,4 @@
-import { RoomClass } from "../models";
+import { RoomClass } from "../../models";
 
 const getAllRoomClasses = async (req, res) => {
   const data = await RoomClass.findAll({});

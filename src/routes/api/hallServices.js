@@ -1,5 +1,5 @@
 import express from "express";
-import hallServiceController from "../../controllers/hallServiceController";
+import hallServiceController from "../../controllers/halls/hallServiceController";
 
 const routes = express.Router();
 

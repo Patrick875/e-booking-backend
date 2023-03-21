@@ -12,8 +12,6 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.Reservation, { foreignKey: 'hallId' });
-      this.belongsToMany(models.HallService, {through: models.HallSaleService} )
-
     }
   }
   Hall.init({

@@ -1,8 +1,28 @@
-import { Reservation, Customer, Room, Hall, User } from "../models";
+import {
+  Reservation,
+  Customer,
+  Room,
+  Hall,
+  User,
+  HallService,
+  ReservationService,
+} from "../models";
 
 const AllReservations = async (req, res) => {
   const data = await Reservation.findAll({
-    include: [Customer, Room, Hall, User],
+    include: [
+      { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      { model: Hall, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      { model: User, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      {
+        model: HallService,
+        attributes: {
+          exclude: ["createdAt", "updatedAt"]
+        },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
   return res.status(200).json({ status: "ok", data });
@@ -45,8 +65,22 @@ const CreateReservation = async (req, res) => {
   try {
     const reservation = await Reservation.create(req.body);
 
+    Object.keys(req.body).forEach(async (key, val) => {
+      let services = {};
+      if (key.startsWith("service_")) {
+        services.HallServiceId = Number(key.split("_")[1]);
+        services.ReservationId = reservation.id;
+        services.quantity = req.body[key];
+
+        let svces = await HallService.findByPk(Number(key.split("_")[1]));
+        if (svces) {
+          await ReservationService.create(services);
+        }
+      }
+    });
+
     const data = await Reservation.findByPk(reservation.id, {
-      include: [Customer, Room, Hall, User],
+      include: [Customer, Room, Hall, User, HallService],
     });
 
     return res.status(201).json({ status: "ok", data });

@@ -1,4 +1,4 @@
-import { ProductCategory, Package } from "../models";
+import { ProductCategory, Package } from "../../models";
 
 const CreateProductCategory = async (req, res) => {
   if (!req.body?.name) {
@@ -11,6 +11,7 @@ const CreateProductCategory = async (req, res) => {
 };
 
 const UpdateProductCategory = async (req, res) => {
+  
   if (!req.body?.id || !req.body?.name) {
     return res
       .status(400)

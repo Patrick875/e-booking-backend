@@ -1,4 +1,4 @@
-import { Hall, HallService } from "../models";
+import { Reservation, HallService } from "../../models";
 
 const CreateHallService = async (req, res) => {
   if (!req.body?.name || !req.body?.price) {
@@ -70,7 +70,7 @@ const DeleteHallService = async (req, res) => {
 const GetAllService = async (req, res) => {
   try {
     const hallServices = await HallService.findAll({
-      include: [{model : Hall, attributes: {exclude: ['createdAt', 'updatedAt']}}],
+      include: [{model : Reservation, attributes: {exclude: ['createdAt', 'updatedAt']}}],
       attributes: {exclude: ['createdAt', 'updatedAt']}
     });
     return res.status(200).json({ status: `ok`, data: hallServices });

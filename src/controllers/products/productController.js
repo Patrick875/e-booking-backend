@@ -1,4 +1,4 @@
-import { Product, Package, ProductCategory, ProductPackage } from "../models";
+import { Product, Package, ProductCategory, ProductPackage } from "../../models";
 
 const CreateProduct = async (req, res) => {
   if (!req.body?.name) {
