@@ -62,6 +62,23 @@ const CreateReservation = async (req, res) => {
     }
   }
 
+  if(req.body?.customerId){
+    const customer = await Customer.findByPk(req.body.customerId);
+    if(!customer){
+      return res.status(404).json({status: `error` , message: 'customer not found' })
+    }
+
+  }
+
+  if(req.body?.userId){
+    const user = await User.findByPk(req.body.userId);
+    
+    if(!user){
+      return res.status(404).json({status: 'error' , message: 'user not found'})
+    }
+
+  }
+
   try {
     const reservation = await Reservation.create(req.body);
 
