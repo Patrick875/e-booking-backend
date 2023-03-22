@@ -106,9 +106,9 @@ const GetReservation = async (req, res) => {
 };
 
 const UpdateReservation = async (req, res) => {
-  if (!req.params.id)
+  if (!req.body.id)
     return res.status(400).json({ status: "error", message: "id is required" });
-  const reservation = await Reservation.findByPk(req.params.id);
+  const reservation = await Reservation.findByPk(req.body.id);
 
   if (!reservation)
     return res
