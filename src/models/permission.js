@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.Role, {through: models.RolePermission});
+      // this.belongsToMany(models.Role, {through: models.RolePermission});
 
     }
   }
@@ -20,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     display_name: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Permissions',
-    tableName: 'permissions'
+    modelName: 'Permission',
+    tableName: 'Permissions'
   });
   return Permission;
 };

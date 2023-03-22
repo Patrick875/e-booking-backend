@@ -1,24 +1,25 @@
 import { Role,Permission, RolePermission } from "../models";
 
-const getAllRoles = async (req, res) => {
-  const roles = await Role.findAll({});
-  res.status(200).json({ message: "ok", roles });
+const index = async (req, res) => {
+  const data = await Permission.findAll({});
+  res.status(200).json({ message: "ok", data });
 };
 
-const getRole = async (req, res) => {
+const show = async (req, res) => {
 
   if(!req.params.id) return res.status(400).json({ status: "error", message: "Bad Request" });
 
-  const role = await Role.findByPk(req.params.id);
-  if (!role) {
+  const row = await Permission.findByPk(req.params.id);
+  if (!row) {
     return res
       .status(204)
-      .json({ message: `Role with id  does not exist` });
+      .json({ message: `Permission with id  does not exist`});
   }
-  res.status(200).json(role);
+  res.status(200).json({status: 'ok', data:row});
 };
 
-const createRole = async (req, res) => {
+const create = async (req, res) => {
+
   if (
     !req.body.name
   ) {
@@ -31,23 +32,24 @@ const createRole = async (req, res) => {
   const role = await Role.create(req.body);
 
 
-  Object.keys(req.body).forEach(async (key, val) => {
-    let permissions = {};
-    if (key.startsWith("permission_")) {
-      permissions.PermissionId = Number(key.split("_")[1]);
-      permissions.RoleId = role.id;
+//   Object.keys(req.body).forEach(async (key, val) => {
+//     let permissions = {};
+//     if (key.startsWith("permission_")) {
+//       permissions.PermissionId = Number(key.split("_")[1]);
+//       permissions.RoleId = role.id;
 
-      let pkg = await Permission.findByPk(Number(key.split("_")[1]));
-      if (pkg) {
-        await RolePermission.create(permissions);
-      }
-    }
-  });
+//       let pkg = await Permission.findByPk(Number(key.split("_")[1]));
+//       if (pkg) {
+//         await RolePermission.create(permissions);
+//       }
+//     }
+//   });
 
   return res.status(201).json({ message: "ok", role });
 };
 
 const updateRole = async (req, res) => {
+
   if(!req.body.id) return res.status(400).json({ status: "error", message: "Bad Request" });
 
   const role = await Role.findByPk(req.body.id);

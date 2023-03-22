@@ -13,6 +13,14 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      access: {
+        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.STRING)
+      },
+      permission: {
+        allowNull: false,
+        type: Sequelize.ARRAY(Sequelize.STRING)
+      },
       display_name: {
         type: Sequelize.STRING
       },
