@@ -55,6 +55,9 @@ const createUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
+  if(isNaN(req.params.id)){
+    return res.status(400).json({status: `error`, message: 'Id must be a number'})
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Please provide user id" });
   }
@@ -73,6 +76,9 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+  if(!req.body?.id){
+    return res.status(400).json({ status: "error", message: " Id is required" });
+  }
   if (!req.body.id) {
     return res
       .status(400)

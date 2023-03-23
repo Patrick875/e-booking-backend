@@ -21,8 +21,7 @@ const AllReservations = async (req, res) => {
           exclude: ["createdAt", "updatedAt"]
         },
       },
-    ],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
+    ]
   });
 
   return res.status(200).json({ status: "ok", data });
