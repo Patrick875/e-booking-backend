@@ -62,12 +62,12 @@ const deleteUser = async (req, res) => {
     return res.status(400).json({ message: "Please provide user id" });
   }
 
-  const user = await User.findByPk(req.body.id);
+  const user = await User.findByPk(req.params.id);
 
   if (!user) {
     return res
       .status(204)
-      .json({ message: `User with id : ${req.body.id} does not exist` });
+      .json({ message: `User with id : ${req.params.id} does not exist` });
   }
 
   await user.destroy();
