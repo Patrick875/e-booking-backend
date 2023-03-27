@@ -42,11 +42,14 @@ const CreateReservation = async (req, res) => {
     return res.status(400).json({ error: `${errors} are required` });
   }
 
-  if (!req.body.roomId && !req.body.hallId) {
+  
+
+  if (!req.body.roomId && !req.body.hallId && !req.body.details) {
     return res
       .status(400)
-      .json({ error: "roomId and hallId can't both be empty" });
+      .json({ error: "roomId, hallId and details can't both be empty" });
   }
+
 
   if (req.body?.roomId) {
     const room = await Room.findByPk(req.body.roomId);
