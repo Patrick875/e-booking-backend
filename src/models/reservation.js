@@ -25,12 +25,13 @@ module.exports = (sequelize, DataTypes) => {
       roomId: DataTypes.INTEGER,
       hallId: DataTypes.INTEGER,
       customerId: DataTypes.INTEGER,
+      details: DataTypes.JSONB,
       userId: DataTypes.INTEGER,
       amount: DataTypes.DECIMAL(10, 2),
       payment: DataTypes.INTEGER,
       booking_date: {
         type: DataTypes.DATE,
-        defaultValue: new Date(),
+        defaultValue: DataTypes.NOW
       },
 
       payment_status: DataTypes.STRING,

@@ -42,6 +42,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
+      details : {
+        type: Sequelize.JSONB,
+        allowNull : true
+
+      },
       status: {
         defaultValue: "INROOM",
         type: Sequelize.STRING,

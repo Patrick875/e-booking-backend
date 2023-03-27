@@ -57,7 +57,7 @@ const updateRole = async (req, res) => {
 
   return res
     .status(200)
-    .json({ status: "ok", message: "Role updated successfully", role });
+    .json({ status: "ok", message: "Role updated successfully", data: role });
 };
 
 const deleteRole = async (req, res) => {
