@@ -1,6 +1,7 @@
 import { ProductCategory, Package } from "../../models";
+import { asyncWrapper } from '../../utils/handlingTryCatchBlocks'
 
-const CreateProductCategory = async (req, res) => {
+const CreateProductCategory = asyncWrapper(async (req, res) => {
   if (!req.body?.name) {
     return res
       .status(400)
@@ -8,9 +9,9 @@ const CreateProductCategory = async (req, res) => {
   }
   const category = await ProductCategory.create(req.body);
   return res.status(201).json({ status: "ok", data: category });
-};
+});
 
-const UpdateProductCategory = async (req, res) => {
+const UpdateProductCategory = asyncWrapper( async (req, res) => {
   
   if (!req.body?.id || !req.body?.name) {
     return res
@@ -32,9 +33,9 @@ const UpdateProductCategory = async (req, res) => {
   await category.save();
 
   return res.status(200).json({ status: "ok", data: category });
-};
+});
 
-const DeleteProductCategory = async (req, res) => {
+const DeleteProductCategory = asyncWrapper(async (req, res) => {
   if (!req.params?.id) {
     return res
       .status(400)
@@ -47,7 +48,7 @@ const DeleteProductCategory = async (req, res) => {
       .json({ status: "error", message: "category not found" });
   await category.destroy();
   return res.status(200).json({ status: "ok", message: "category deleted" });
-};
+});
 
 const GetProductCategory = async (req, res) => {
   if (!req.params?.id) {

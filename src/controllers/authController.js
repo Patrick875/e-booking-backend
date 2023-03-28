@@ -1,13 +1,12 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {User} from '../models';
-import {Role} from '../models';
-
-import dotenv from 'dotenv'
+import {User,  Role} from '../models';
+import dotenv from 'dotenv';
+import { asyncWrapper } from '../utils/handlingTryCatchBlocks';
 
 dotenv.config()
 
-const handleLogin = async (req, res) => {
+const handleLogin = asyncWrapper(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
@@ -58,6 +57,6 @@ const handleLogin = async (req, res) => {
     return res.status(200).json({ user, accessToken, message: 'Loggin succesfull' });
   }
   return res.status(401).json({ message: 'Login failed' });
-};
+});
 
 export default { handleLogin };

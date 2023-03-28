@@ -1,6 +1,7 @@
 import { Package, Product, ProductCategory } from "../models";
+import  {asyncWrapper } from '../utils/handlingTryCatchBlocks'
 
-const CreatePackage = async (req, res) => {
+const CreatePackage = asyncWrapper( async (req, res) => {
   if (!req.body.name || !req.body.category) {
     return res
       .status(400)
@@ -23,9 +24,9 @@ const CreatePackage = async (req, res) => {
     message: "package created successfully",
     data: result,
   });
-};
+});
 
-const UpdatePackage = async (req, res) => {
+const UpdatePackage = asyncWrapper ( async (req, res) => {
   if (!req.body?.id)
     return res
       .status(400)
@@ -49,9 +50,9 @@ const UpdatePackage = async (req, res) => {
     message: "package updated successfully",
     data: packages,
   });
-};
+});
 
-const DeletePackage = async (req, res) => {
+const DeletePackage = asyncWrapper ( async (req, res) => {
   if (!req.params?.id) {
     return res
       .status(400)
@@ -72,9 +73,9 @@ const DeletePackage = async (req, res) => {
     status: "ok",
     message: `Package with id ${req.params.id} deleted`,
   });
-};
+});
 
-const GetPackage = async (req, res) => {
+const GetPackage = asyncWrapper( async (req, res) => {
   if (!req.params?.id) {
     return res
       .status(400)
@@ -84,15 +85,15 @@ const GetPackage = async (req, res) => {
     include: [Product, ProductCategory],
   });
   return res.status(200).json({ status: "ok", data: packages });
-};
+});
 
-const GetPackages = async (req, res) => {
+const GetPackages = asyncWrapper(async (req, res) => {
   const packages = await Package.findAll({
     order: [["id", "DESC"]],
     include: [Product, ProductCategory],
   });
   return res.status(200).json({ status: "ok", data: packages });
-};
+});
 
 export default {
   CreatePackage,

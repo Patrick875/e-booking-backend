@@ -1,6 +1,6 @@
 import { Customer, Reservation, Room, Hall, RoomClass } from "../models";
-
-const CreateCustomer = async (req, res) => {
+import { asyncWrapper } from '../utils/handlingTryCatchBlocks'
+const CreateCustomer = asyncWrapper(async (req, res) => {
   let error = "";
   let is_valid = true;
   const validationArr = [
@@ -29,15 +29,13 @@ const CreateCustomer = async (req, res) => {
       .json({ status: `error`, message: ` ${error} is required\n` });
   }
 
-  try {
+
     const result = await Customer.create(req.body);
     return res.status(201).json({ status: `success`, data: result });
-  } catch (error) {
-    return res.status(500).json({ status: `error`, message: error });
-  }
-};
 
-const DeleteCustomer = async (req, res) => {
+});
+
+const DeleteCustomer = asyncWrapper(async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({
       status: `error`,
@@ -54,9 +52,9 @@ const DeleteCustomer = async (req, res) => {
 
   customer.update({ status: `deleted` });
   //  To be completed
-};
+});
 
-const UpdateCustomer = async (req, res) => {
+const UpdateCustomer = asyncWrapper(async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({
       status: `error`,
@@ -81,10 +79,10 @@ const UpdateCustomer = async (req, res) => {
     data: customer,
     message: "you have successfully updated the customer",
   });
-};
+});
 
-const GetAllCustomers = async (req, res) => {
-  try {
+const GetAllCustomers = asyncWrapper(async (req, res) => {
+
     const customers = await Customer.findAll({
       include: [
         {
@@ -113,10 +111,8 @@ const GetAllCustomers = async (req, res) => {
     });
 
     return res.status(200).json({ status: `ok`, data: customers });
-  } catch (error) {
-    return res.status(500).json({ status: `error`, message: error });
-  }
-};
+
+});
 
 export default {
   CreateCustomer,

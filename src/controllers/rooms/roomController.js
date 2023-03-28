@@ -1,6 +1,7 @@
 import { Room, RoomClass, Reservation } from "../../models";
+import { asyncWrapper } from '../../utils/handlingTryCatchBlocks'
 
-const getAllRoom = async (req, res) => {
+const getAllRoom = asyncWrapper(async (req, res) => {
   let data = await Room.findAll({
     include: [
       { model: RoomClass, attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -17,17 +18,17 @@ const getAllRoom = async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt","roomClassId"] },
   });
 
-  let newdata = data.map((item, index, arrayColl) => {
+  // let newdata = data.map((item, index, arrayColl) => {
 
-    arrayColl['book_date'] = item.Reservations
-    return ;
-    // return {...item, book_date: { checkIn : item.Reservations.checkIn, checkOut : item.Reservations.checkOut }}
-  })
+  //   arrayColl['book_date'] = item.Reservations
+  //   return ;
+  //   return {...item, book_date: { checkIn : item.Reservations.checkIn, checkOut : item.Reservations.checkOut }}
+  // })
 
   res.status(200).json({ message: "ok", data });
-};
+});
 
-const getRoom = async (req, res) => {
+const getRoom = asyncWrapper(async (req, res) => {
 
   if(!req.params.id){
     return res.status(404).json({status: 'error', message: 'Id is required'});
@@ -63,9 +64,9 @@ const getRoom = async (req, res) => {
       .json({ message: `Room class with id does not exist`, data });
   }
   res.status(200).json({ message: "ok", data });
-};
+});
 
-const createRoom = async (req, res) => {
+const createRoom = asyncWrapper(async (req, res) => {
   if (!req.body.name || !req.body.roomClassId) {
     return res
       .status(400)
@@ -81,9 +82,9 @@ const createRoom = async (req, res) => {
 
   const data = await Room.create(req.body);
   return res.status(201).json({ message: "ok", data });
-};
+});
 
-const deleteRoom = async (req, res) => {
+const deleteRoom = asyncWrapper(async (req, res) => {
   if (!req.params.id)
     return res.status(400).json({ status: "error", message: "bad request" });
 
@@ -98,9 +99,9 @@ const deleteRoom = async (req, res) => {
   return res
     .status(200)
     .json({ status: "ok", message: "Room deleted successfully" });
-};
+});
 
-const updateRoom = async (req, res) => {
+const updateRoom = asyncWrapper(async (req, res) => {
   if (!req.body.id)
     return res.status(400).json({ status: "error", message: "bad request" });
 
@@ -117,7 +118,7 @@ const updateRoom = async (req, res) => {
   return res
     .status(200)
     .json({ status: "ok", message: "Room updated successfully" });
-};
+});
 
 export default {
   getAllRoom,

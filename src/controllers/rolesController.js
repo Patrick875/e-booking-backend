@@ -1,29 +1,28 @@
 import { Role, Permission, RolePermission } from "../models";
+import { asyncWrapper } from '../utils/handlingTryCatchBlocks'
 
-const getAllRoles = async (req, res) => {
+const getAllRoles = asyncWrapper( async (req, res) => {
   const roles = await Role.findAll({});
   res.status(200).json({ message: "ok", roles });
-};
+});
 
-const getRole = async (req, res) => {
+const getRole = asyncWrapper( async (req, res) => {
   if (!req.params.id)
     return res.status(400).json({ status: "error", message: "Bad Request" });
   if(isNaN(req.params.id)){
     return res.status(400).json({ status: "error", message: `Id should be a number` });
   }
 
-  try {
+ 
     const role = await Role.findByPk(req.params.id);
     if (!role) {
       return res.status(204).json({ message: `Role with id  does not exist` });
     }
     res.status(200).json(role);
-  } catch (error) {
-    return res.status(500).json({status: `error`, message: `Error: ${error.message}`});
-  }
-};
 
-const createRole = async (req, res) => {
+});
+
+const createRole = asyncWrapper( async (req, res) => {
   if (!req.body.name) {
     return res
       .status(400)
@@ -33,16 +32,14 @@ const createRole = async (req, res) => {
     ? req.body.name
     : req.body["display_name"];
 
-  try {
+
     const role = await Role.create(req.body);
 
     return res.status(201).json({ message: "ok", role });
-  } catch (error) {
-    return res.status(500).json({ status: "error", message: error.message });
-  }
-};
+ 
+});
 
-const updateRole = async (req, res) => {
+const updateRole = asyncWrapper( async (req, res) => {
   if (!req.body.id)
     return res.status(400).json({ status: "error", message: "Bad Request" });
 
@@ -58,9 +55,9 @@ const updateRole = async (req, res) => {
   return res
     .status(200)
     .json({ status: "ok", message: "Role updated successfully", data: role });
-};
+});
 
-const deleteRole = async (req, res) => {
+const deleteRole = asyncWrapper( async (req, res) => {
   if (!req.params.id)
     return res.status(400).json({ status: "error", message: "Bad Request" });
 
@@ -73,7 +70,7 @@ const deleteRole = async (req, res) => {
   return res
     .status(200)
     .json({ status: "ok", message: "Role deleted successfully" });
-};
+});
 export default {
   getAllRoles,
   getRole,

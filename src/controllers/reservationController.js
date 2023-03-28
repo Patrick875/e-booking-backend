@@ -7,8 +7,9 @@ import {
   HallService,
   ReservationService,
 } from "../models";
+import { asyncWrapper } from '../utils/handlingTryCatchBlocks'
 
-const AllReservations = async (req, res) => {
+const AllReservations = asyncWrapper( async (req, res) => {
   const data = await Reservation.findAll({
     include: [
       { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -25,9 +26,9 @@ const AllReservations = async (req, res) => {
   });
 
   return res.status(200).json({ status: "ok", data });
-};
+});
 
-const CreateReservation = async (req, res) => {
+const CreateReservation =asyncWrapper(  async (req, res) => {
   const validationArr = ["checkIn", "checkOut", "booking_type", "customerId"];
   let errors;
   let is_valid = true;
@@ -81,7 +82,7 @@ const CreateReservation = async (req, res) => {
 
   }
 
-  try {
+
     const reservation = await Reservation.create(req.body);
 
     Object.keys(req.body).forEach(async (key, val) => {
@@ -103,10 +104,8 @@ const CreateReservation = async (req, res) => {
     });
 
     return res.status(201).json({ status: "ok", data });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
+ 
+});
 
 const GetReservation = async (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: "id is required" });

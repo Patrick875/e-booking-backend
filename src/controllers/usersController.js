@@ -1,13 +1,17 @@
 /* eslint-disable consistent-return */
 import bcrypt from "bcrypt";
 import { User, Role } from "../models";
+import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
-const getAllUsers = async (req, res) => {
-  const users = await User.findAll({ include: Role }, { exclude: ["password", "createdAt","updatedAt"] });
+const getAllUsers = asyncWrapper(async (req, res) => {
+  const users = await User.findAll(
+    { include: Role },
+    { exclude: ["password", "createdAt", "updatedAt"] }
+  );
   res.status(200).json({ message: "ok", users });
-};
+});
 
-const getUser = async (req, res) => {
+const getUser = asyncWrapper(async (req, res) => {
   if (!req.params?.id) {
     return res.status(400).json({ message: "Bad Request" });
   }
@@ -25,9 +29,9 @@ const getUser = async (req, res) => {
       .json({ message: `User with id : ${req.params.id} does not exist` });
   }
   res.status(200).json(user);
-};
+});
 
-const createUser = async (req, res) => {
+const createUser = asyncWrapper(async (req, res) => {
   if (
     !req.body?.firstName ||
     !req.body?.lastName ||
@@ -52,11 +56,13 @@ const createUser = async (req, res) => {
   }
   const user = await User.create(req.body);
   return res.status(201).json({ message: "ok", user });
-};
+});
 
-const deleteUser = async (req, res) => {
-  if(isNaN(req.params.id)){
-    return res.status(400).json({status: `error`, message: 'Id must be a number'})
+const deleteUser = asyncWrapper(async (req, res) => {
+  if (isNaN(req.params.id)) {
+    return res
+      .status(400)
+      .json({ status: `error`, message: "Id must be a number" });
   }
   if (!req.params.id) {
     return res.status(400).json({ message: "Please provide user id" });
@@ -72,12 +78,16 @@ const deleteUser = async (req, res) => {
 
   await user.destroy();
 
-  return res.status(200).json({ status: "ok", message: "User deleted successfully" });
-};
+  return res
+    .status(200)
+    .json({ status: "ok", message: "User deleted successfully" });
+});
 
-const updateUser = async (req, res) => {
-  if(!req.body?.id){
-    return res.status(400).json({ status: "error", message: " Id is required" });
+const updateUser = asyncWrapper(async (req, res) => {
+  if (!req.body?.id) {
+    return res
+      .status(400)
+      .json({ status: "error", message: " Id is required" });
   }
   if (!req.body.id) {
     return res
@@ -109,8 +119,8 @@ const updateUser = async (req, res) => {
 
   return res
     .status(200)
-    .json({ status: "ok", message: "User updated successfully" , data: user});
-};
+    .json({ status: "ok", message: "User updated successfully", data: user });
+});
 export default {
   getAllUsers,
   getUser,
