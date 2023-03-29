@@ -2,24 +2,22 @@ import {
   StockPurchaseOrder,
   StockItemValue,
   StockPurchaseOrderDetail,
+  StockItem
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
-const create = asyncWrapper( async (req, res) => {
+const create = asyncWrapper(async (req, res) => {
   console.log(req.body.order);
   if (!req.body?.order || typeof req.body.order !== "object") {
-    return res
-      .status(400)
-      .json({
-        status: "error",
-        message: "Tatal is required and should be an array",
-      });
+    return res.status(400).json({
+      status: "error",
+      message: "Tatal is required and should be an array",
+    });
   }
 
   let total = req.body.order.reduce((acc, curr) => {
     return acc + curr.price;
   }, 0);
-
 
   const pOrder = await StockPurchaseOrder.create({
     date: new Date(),
@@ -49,7 +47,7 @@ const create = asyncWrapper( async (req, res) => {
         unitPrice: element.price,
       });
 
-      console.log(stockDetail)
+      console.log(stockDetail);
     }
   }
 
@@ -58,4 +56,25 @@ const create = asyncWrapper( async (req, res) => {
     .json({ status: "ok", message: "Successifully Purchase Order added " });
 });
 
-export default { create };
+const index = asyncWrapper(async (req, res) => {
+  const data = await StockPurchaseOrder.findAll({
+    include: [
+      {
+        model: StockPurchaseOrderDetail,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+        include: [
+          {
+            model: StockItem,
+            attributes: { exclude : ["createdAt", "updatedAt"] },
+    
+          }
+        ]
+      }
+    ],
+  });
+
+  return res
+    .status(200)
+    .json({ status: "ok", message: "Purchase order  retrieved", data });
+});
+export default { create, index };

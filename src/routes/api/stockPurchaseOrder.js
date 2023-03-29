@@ -3,7 +3,7 @@ import stockPurchaaseController from '../../controllers/stock/stockPurchaseOrder
 
 const routes = express.Router();
 
-// routes.get('/all', stockPurchaaseController.index);
+routes.get('/all', stockPurchaaseController.index);
 routes.post('/add', stockPurchaaseController.create);
 // routes.put('/update', stockPurchaaseController.UpdateItem);
 // routes.delete('/delete/:id', stockPurchaaseController.DeleteItem);
