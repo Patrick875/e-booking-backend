@@ -13,11 +13,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
-      unit: {
-        allowNull: false,
-        defaultValues: 'KG',
-        type: Sequelize.STRING
-      },
       status: {
         type: Sequelize.STRING
       },

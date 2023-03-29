@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
   }
   StockItem.init({
     name: DataTypes.STRING,
-    unit: DataTypes.STRING,
     status: DataTypes.STRING
   }, {
     sequelize,
