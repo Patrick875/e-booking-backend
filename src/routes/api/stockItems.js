@@ -1,5 +1,5 @@
 import express from 'express';
-import stockItemController from '../../controllers/stockItemController';
+import stockItemController from '../../controllers/stock/stockItemController';
 
 const routes = express.Router();
 

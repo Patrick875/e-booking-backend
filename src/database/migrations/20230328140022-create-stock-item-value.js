@@ -2,24 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('StockItems', {
+    await queryInterface.createTable('StockItemValues', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        allowNull: false,
-        type: Sequelize.STRING
+      quantity: {
+        type: Sequelize.INTEGER
       },
-      unit: {
-        allowNull: false,
-        defaultValues: 'KG',
-        type: Sequelize.STRING
+      price: {
+        type: Sequelize.INTEGER
       },
-      status: {
-        type: Sequelize.STRING
+      stockItemId: {
+        type: Sequelize.INTEGER,
+        allowNull:false,
+        references: {
+          key: 'id',
+          model: 'stockItem',
+          onDelete: 'RESTRICT',
+          onUpdate : 'CASCADE'
+
+        }
       },
       createdAt: {
         allowNull: false,
@@ -32,6 +37,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('StockItems');
+    await queryInterface.dropTable('StockItemValues');
   }
 };

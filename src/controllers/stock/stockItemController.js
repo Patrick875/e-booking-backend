@@ -1,5 +1,5 @@
-import { StockItem } from "../models";
-import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
+import { StockItem } from "../../models";
+import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateItem = asyncWrapper ( async (req, res) => {
   if (!req.body.name)
