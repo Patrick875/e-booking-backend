@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   StockReceiveVoucher.init({
+
     date: DataTypes.DATE,
     status: DataTypes.STRING,
     userId: DataTypes.INTEGER,

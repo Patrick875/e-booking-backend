@@ -7,11 +7,11 @@ import {
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const create = asyncWrapper(async (req, res) => {
-  console.log(req.body.order);
+
   if (!req.body?.order || typeof req.body.order !== "object") {
     return res.status(400).json({
       status: "error",
-      message: "Tatal is required and should be an array",
+      message: "Order Required and should be an Object",
     });
   }
 
@@ -27,9 +27,6 @@ const create = asyncWrapper(async (req, res) => {
 
   if (pOrder) {
     for (let element of req.body.order) {
-      let itemValue = await StockItemValue.findOne({
-        where: { price: element.price, stockItemId: element.id },
-      });
 
       if (!itemValue) {
         itemValue = await StockItemValue.create({
@@ -45,9 +42,11 @@ const create = asyncWrapper(async (req, res) => {
         currentQuantity: itemValue.quantity,
         requestQuantity: element.quantity,
         unitPrice: element.price,
+
       });
 
     }
+
   }
 
   return res
