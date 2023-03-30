@@ -47,7 +47,6 @@ const create = asyncWrapper(async (req, res) => {
         unitPrice: element.price,
       });
 
-      console.log(stockDetail);
     }
   }
 
@@ -77,4 +76,27 @@ const index = asyncWrapper(async (req, res) => {
     .status(200)
     .json({ status: "ok", message: "Purchase order  retrieved", data });
 });
-export default { create, index };
+
+const show = asyncWrapper( async (req, res) => {
+  if(!req.params?.id || isNaN(req.params?.id)) return res.status(400).json({staus: 'error', message: 'Invalid id'});
+
+  const row = await StockPurchaseOrder.findByPk(req.params.id,{
+    include: [
+      {
+        model: StockPurchaseOrderDetail,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+        include: [
+          {
+            model: StockItem,
+            attributes: { exclude : ["createdAt", "updatedAt"] },
+    
+          }
+        ]
+      }
+    ],
+  })
+
+  return res.status(200).json({status: 'success' , message: 'Successfull retrieval', data: data})
+
+})
+export default { create, index , show};

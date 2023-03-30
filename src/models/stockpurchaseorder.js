@@ -11,10 +11,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.hasOne(models.StockPurchaseOrderDetail, { foreignKey: 'stockPurchaseOrderId' })
+      this.hasMany(models.StockPurchaseOrderDetail, { foreignKey: 'stockPurchaseOrderId' })
     }
   }
   StockPurchaseOrder.init({
+    
     date: DataTypes.DATE,
     status: {
       type: DataTypes.STRING,
