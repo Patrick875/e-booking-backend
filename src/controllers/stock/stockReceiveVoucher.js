@@ -3,7 +3,7 @@ import {
     StockItem,
     StockItemValue,
     StockReceiveVoucher,
-    StockReciveVoucherDetail
+    StockReceiveVoucherDetail
   } from "../../models";
   import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
@@ -31,22 +31,24 @@ const create = asyncWrapper( async (req , res) => {
       });
     
   if (reveiveVoucher) {
-    for (let element of req.body.data) {
+    for (let element of data) {
+
+      console.log(element, data);
 
       let itemValue = await StockItemValue.findOne({
-        where: { price: element.price, stockItemId: element.stockId },
+        where: { price: element.price, stockItemId: element.item_id },
       });
 
       if (!itemValue) {
         itemValue = await StockItemValue.create({
           quantity: element.quantity,
           price: element.price,
-          stockItemId: element.itemId,
+          stockItemId: element.item_id,
         });
       }
 
-      let stockDetail = await StockReciveVoucherDetail.create({
-        stockItemId: element.itemId,
+      let stockDetail = await StockReceiveVoucherDetail.create({
+        stockItemId: element.item_id,
         stockReceiveVoucherId: reveiveVoucher.id,
         receivedQuantity: element.quantity,
         unitPrice: element.price,
@@ -63,4 +65,21 @@ const create = asyncWrapper( async (req , res) => {
 
 })
 
-export default { create } 
+const index = asyncWrapper( async(req, res) => {
+  const data = await StockReceiveVoucher.findAll({include: [{
+    model: StockPurchaseOrder,
+    attributes: { exclude : ['createdAt', 'updatedAt'] }
+
+  },
+{
+  model: StockReceiveVoucherDetail,
+  include: [{
+    model: StockItem,
+    attributes: { exclude : ['createdAt', 'updatedAt'] }
+
+  }],
+  attributes: { exclude : ['createdAt', 'updatedAt'] }
+}]})
+} )
+
+export default { create, index } 

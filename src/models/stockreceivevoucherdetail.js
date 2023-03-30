@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
+  
   StockReceiveVoucherDetail.init({
     stockItemId: DataTypes.INTEGER,
     stockReceiveVoucherId: DataTypes.INTEGER,
