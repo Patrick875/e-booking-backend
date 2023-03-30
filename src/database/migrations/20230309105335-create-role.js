@@ -15,7 +15,7 @@ module.exports = {
       },
       access: {
         allowNull: false,
-        type: Sequelize.ARRAY(Sequelize.STRING)
+        type: Sequelize.JSONB
       },
       permission: {
         allowNull: false,
