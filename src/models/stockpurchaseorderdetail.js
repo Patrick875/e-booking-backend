@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     stockPurchaseOrderId: DataTypes.INTEGER,
     currentQuantity: DataTypes.INTEGER,
     requestQuantity: DataTypes.INTEGER,
-    unitPrice: DataTypes.INTEGER
+    unitPrice: DataTypes.INTEGER,
+    unit: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'StockPurchaseOrderDetail',

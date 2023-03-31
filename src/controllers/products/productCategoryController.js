@@ -7,6 +7,10 @@ const CreateProductCategory = asyncWrapper(async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Name is required" });
   }
+
+  if(await ProductCategory.findOne({where : { name : req.body.name }})){
+    return res.status(409).json({status: `error`, message: `Room ${req.body.name} already  exists`});
+  }
   const category = await ProductCategory.create(req.body);
   return res.status(201).json({ status: "ok", data: category });
 });

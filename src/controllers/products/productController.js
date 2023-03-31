@@ -7,6 +7,9 @@ const CreateProduct = async (req, res) => {
       .json({ status: "error", message: "name and Category is required" });
   }
 
+  if(await Product.findOne({where : { name : req.body.name }})){
+    return res.status(409).json({status: `error`, message: `Room ${req.body.name} already  exists`});
+  }
   const product = await Product.create({
     name: req.body.name,
   });

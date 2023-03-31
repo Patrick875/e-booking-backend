@@ -7,14 +7,14 @@ const verifyJWT =  (req, res, next) => {
  
   if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ message: 'Not authenticated.'});
   const token = authHeader.split(' ')[1];
+  console.log(token)
    jwt.verify(
     token,
     process.env.ACCESS_TOKEN_SECRET,
     // eslint-disable-next-line consistent-return
     (err, decoded) => {
       if (err) return res.status(403).json({ message: res.message }); // invalid token
-      req.email = decoded.UserInfo.email;
-      req.roles = decoded.UserInfo.roles;
+      req.user = decoded.user;
        next();
     }
   );

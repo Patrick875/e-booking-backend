@@ -2,8 +2,14 @@ import { StockItem } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateItem = asyncWrapper ( async (req, res) => {
+
+  const name = req.body.name
   if (!req.body.name)
     return res.status(400).json({ message: "Name is required" });
+
+  if(await StockItem.findOne({ where : { name}})){
+    return res.status(409).json({status: 'error', message: `${name} is already saved`})
+  }
 
   const stock_item = await StockItem.create(req.body);
   return res
@@ -18,6 +24,7 @@ const GetItem = asyncWrapper(async (req, res) => {
   if(!item) {
     return res.status(404).json({status: 'error' , message: 'Item not found'})
   }
+  return res.status(200).json({status: 'success' , data: item})
 });
 
 const GetItems =  asyncWrapper(  async (req, res) => {
@@ -38,12 +45,12 @@ const UpdateItem = asyncWrapper (async (req, res) => {
   stock_item.save();
   return res
     .status(200)
-    .json({ status: `ok`, message: " Stock Item updated successfully" });
+    .json({ status: `ok`, message: " Stock Item updated successfully", data: stock_item });
 });
 
 const DeleteItem = asyncWrapper(async (req, res) => {
-  if(!req.body.id) return res.status(400).json({ message: "id is required " });
-  const stock_item = StockItem.findByPk(req.body.id);
+  if(!req.params.id) return res.status(400).json({ message: "id is required " });
+  const stock_item = await StockItem.findByPk(req.params.id);
   if(!stock_item) return res.status(404).json({ message: " Item not found"});
   await stock_item.destroy();
   return res.status(200).json({ status: `ok`, message: " Item deleted successfully" });

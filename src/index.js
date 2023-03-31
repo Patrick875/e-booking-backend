@@ -21,8 +21,11 @@ import hallService from './routes/api/hallServices'
 import purchaseOrderRoutes from './routes/api/stockPurchaseOrder'
 import stockReceiveVoucherRoutes  from './routes/api/stockReceiveVoucher';
 
+
 import loginRouter from './routes/login';
 import logoutRouter from './routes/logout';
+
+import verifyJWT from './middleware/verifyJWT'
 
 // import {swaggerDocRouter} from './docs';
 import db from "./models/index";
@@ -39,6 +42,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/', home);
+app.use('/api/v1/login', loginRouter);
+// app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
+app.use(verifyJWT)
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);
@@ -57,7 +63,7 @@ app.use('/api/v1/hall/services', hallService);
 app.use('/api/v1/purchase/order', purchaseOrderRoutes);
 app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 
-app.use('/api/v1/login', loginRouter);
+
 app.use('/api/logout', logoutRouter);
 // app.use(swaggerDocRouter);
 

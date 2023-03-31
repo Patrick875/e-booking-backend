@@ -61,8 +61,6 @@ const create = asyncWrapper( async (req , res) => {
   return res
   .status(201)
   .json({ status: "ok", message: "Successifully Receive Voucher added " });
-
-
 })
 
 const index = asyncWrapper( async(req, res) => {
@@ -80,6 +78,8 @@ const index = asyncWrapper( async(req, res) => {
   }],
   attributes: { exclude : ['createdAt', 'updatedAt'] }
 }]})
+
+return res.status(200).json({status: 'success', data})
 } )
 
 export default { create, index } 

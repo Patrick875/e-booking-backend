@@ -73,6 +73,10 @@ const createRoom = asyncWrapper(async (req, res) => {
       .json({ message: "Please provide all required information" });
   }
 
+  if(await Room.findOne({where : { name : req.body.name }})){
+    return res.status(409).json({status: `error`, message: `Room ${req.body.name} already  exists`});
+  }
+
   const roomClass = await RoomClass.findByPk(req.body.roomClassId);
   if (!roomClass) {
     return res.status(400).json({ message: "Room class does not exist" });

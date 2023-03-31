@@ -17,8 +17,10 @@ const handleLogin = asyncWrapper(async (req, res) => {
   const user = await User.findOne({ where: { email },
     include: {
     model: Role,
-    as: 'Role'
-  } });
+    as: 'Role',
+    attributes: { exclude : ['createdAt', 'updatedAt'] }
+  },
+attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT' ]} });
   
   if (!user) return res.status(401).json({message : "user not registered"}); // Unauthorized
   // evaluate password
@@ -32,7 +34,7 @@ const handleLogin = asyncWrapper(async (req, res) => {
         user
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '1m' },
+      { expiresIn: '10m' },
     );
 
     const refreshToken = jwt.sign(
@@ -48,7 +50,7 @@ const handleLogin = asyncWrapper(async (req, res) => {
     // Creates Secure Cookie with refresh token
     res.cookie('jwt', refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'None',
       maxAge: 60 * 60 * 1000,
     });

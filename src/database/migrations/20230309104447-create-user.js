@@ -34,6 +34,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING,
       },
+      refreshToken: {
+        allowNull: true,
+        type: Sequelize.STRING,
+      },
       roleId: {
         allowNull: false,
         type: Sequelize.INTEGER,

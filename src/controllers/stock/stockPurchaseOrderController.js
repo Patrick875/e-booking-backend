@@ -27,26 +27,21 @@ const create = asyncWrapper(async (req, res) => {
 
   if (pOrder) {
     for (let element of req.body.order) {
-
-      if (!itemValue) {
-        itemValue = await StockItemValue.create({
-          quantity: element.quantity,
-          price: element.price,
-          stockItemId: element.id,
-        });
-      }
+      let itemValue = await StockItemValue.findOne({
+        where: { price: element.price, stockItemId: element.id },
+      });
 
       let stockDetail = await StockPurchaseOrderDetail.create({
         stockItemId: element.id,
         stockPurchaseOrderId: pOrder.id,
-        currentQuantity: itemValue.quantity,
+        currentQuantity:itemValue ?  itemValue.quantity : 0,
         requestQuantity: element.quantity,
         unitPrice: element.price,
 
       });
 
     }
-
+    
   }
 
   return res

@@ -18,7 +18,7 @@ const getRole = asyncWrapper( async (req, res) => {
     if (!role) {
       return res.status(204).json({ message: `Role with id  does not exist` });
     }
-    res.status(200).json(role);
+    res.status(200).json({status: 'success', data: role});
 
 });
 

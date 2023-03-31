@@ -25,6 +25,10 @@ const createRoomClass = asyncWrapper(async (req, res) => {
       .json({ message: "Please provide all required information" });
   }
 
+  if(await RoomClass.findOne({ where : {name : req.body.name} }))
+  {
+    return res.status.json({status : 'error', message : `Room  ${req.body.name} already exists`})
+  }
   req.body["status"] = "active";
 
   const data = await RoomClass.create(req.body);

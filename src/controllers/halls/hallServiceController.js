@@ -7,7 +7,14 @@ const CreateHallService = asyncWrapper (async (req, res) => {
       .status(400)
       .json({ status: `error`, message: `name and price are required` });
   }
-
+  if (await HallService.findOne({ where: { name: req.body.name } })) {
+    return res
+      .status(409)
+      .json({
+        status: `error`,
+        message: `Room ${req.body.name} already  exists`,
+      });
+  }
     const hall = await HallService.create(req.body);
     return res.status(200).json({ status: `ok`, data: hall });
 
