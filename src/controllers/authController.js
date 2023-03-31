@@ -34,7 +34,7 @@ attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'ve
         user
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '10m' },
+      { expiresIn: '60m' },
     );
 
     const refreshToken = jwt.sign(
