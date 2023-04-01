@@ -1,35 +1,28 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
+import { User } from '../models'
+import jwt from 'jsonwebtoken'
 
-// eslint-disable-next-line consistent-return
 const handleRefreshToken = async (req, res) => {
-  const { cookies } = req;
-  if (!cookies?.jwt) return res.sendStatus(401);
-  const refreshToken = cookies.jwt;
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(401);
+    const refreshToken = cookies.jwt;
 
-  const foundUser = await User.findOne({ refreshToken }).exec();
-  if (!foundUser) return res.sendStatus(403); // Forbidden
-  // evaluate jwt
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    // eslint-disable-next-line consistent-return
-    (err, decoded) => {
-      if (err || foundUser.username !== decoded.username) return res.sendStatus(403);
-      const roles = Object.values(foundUser.roles);
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            username: decoded.username,
-            roles,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '10s' },
-      );
-      res.json({ roles, accessToken });
-    },
-  );
-};
+    const user = await User.findOne({ refreshToken }).exec();
+    if (!user) return res.status(403).json({status : 'error', message : 'Forbbiden'}); //Forbidden
+    // evaluate jwt 
+    jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        (err, decoded) => {
+            if (err || user.email !== decoded.user.email) return res.status(403).json({ status: 'error', message : 'Forbidden' });
 
-export default { handleRefreshToken };
+            const accessToken = jwt.sign(
+                {user},
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '60m' }
+            );
+            res.status(200).json({ user, accessToken })
+        }
+    );
+}
+
+export default {handleRefreshToken}

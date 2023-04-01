@@ -32,6 +32,11 @@ const createRole = asyncWrapper( async (req, res) => {
     ? req.body.name
     : req.body["display_name"];
 
+    if(await Role.findOne({ where : { name : req.body.name } }))
+    {
+      return res.status(409).json({ status: 'error', message: 'Role already exists' });
+    }
+
 
     const role = await Role.create(req.body);
 

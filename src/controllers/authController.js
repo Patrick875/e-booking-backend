@@ -47,11 +47,24 @@ attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'ve
     user.refreshToken = refreshToken;
     await user.save();
 
+       
+    // Creates Secure Cookie with refresh token
+    const expirationDate = new Date(Date.now() + 60 * 60 * 1000)
+    res.cookie('accessToken', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'none',
+      expiresIn: expirationDate,
+      maxAge: 60 * 60 * 1000,
+    });
+
+
     // Creates Secure Cookie with refresh token
     res.cookie('jwt', refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'None',
+      expiresIn: expirationDate,
       maxAge: 60 * 60 * 1000,
     });
 

@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser';
+
 
 // routers
 import home from './routes/home';
@@ -24,6 +26,7 @@ import stockReceiveVoucherRoutes  from './routes/api/stockReceiveVoucher';
 
 import loginRouter from './routes/login';
 import logoutRouter from './routes/logout';
+import refresh from './routes/refresh';
 
 import verifyJWT from './middleware/verifyJWT'
 
@@ -41,10 +44,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+//middleware for cookies
+app.use(cookieParser());
+
 app.use('/', home);
 app.use('/api/v1/login', loginRouter);
+app.use('/api/v1',refresh)
 // app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
-app.use(verifyJWT)
+// app.use(verifyJWT)
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);
@@ -63,6 +70,15 @@ app.use('/api/v1/hall/services', hallService);
 app.use('/api/v1/purchase/order', purchaseOrderRoutes);
 app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 
+app.get('/setcookie', function(req, res) {
+  res.cookie('name', 'John Doe');
+  res.send('Cookie has been set');
+});
+
+app.get('/getcookie', function(req, res) {
+  const name = req.cookies.name;
+  res.send('The value of cookie "name" is: ' + name);
+});
 
 app.use('/api/logout', logoutRouter);
 // app.use(swaggerDocRouter);

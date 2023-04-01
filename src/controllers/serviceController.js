@@ -8,10 +8,13 @@ const CreateService = asyncWrapper( async (req, res) => {
         .status(400)
         .json({ status: "error", message: "Name and Category is required" });
     }
-  
-    const category = await ServiceCategory.findByPk(req.body.category, { include: [{model: Service}] });
 
-    console.log(category, req.body.category)
+    if(await Service.findOne({ where: { name : req.body.name } })) 
+    {
+      return res.status(409).json({status:  'error', message: 'Duplication error'})
+    }
+
+    const category = await ServiceCategory.findByPk(req.body.category, { include: [{model: Service}] });
   
     if (!category)
       return res

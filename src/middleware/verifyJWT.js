@@ -2,15 +2,13 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const verifyJWT =  (req, res, next) => {
+const verifyJWT = async (req, res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization || req.headers.token;
 
-  console.log(authHeader)
- 
   if (!authHeader?.startsWith('Bearer ')) return res.status(401).json({ message: 'Not authenticated.'});
   const token = authHeader.split(' ')[1];
-  console.log(token)
-   jwt.verify(
+
+  jwt.verify(
     token,
     process.env.ACCESS_TOKEN_SECRET,
     // eslint-disable-next-line consistent-return

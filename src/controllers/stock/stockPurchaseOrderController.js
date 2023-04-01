@@ -54,7 +54,7 @@ const index = asyncWrapper(async (req, res) => {
     include: [
       {
         model: StockPurchaseOrderDetail,
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: { exclude: ["createdAt", "updatedAt", "stockPurchaseOrderId", "stockItemId"] },
         include: [
           {
             model: StockItem,
@@ -64,6 +64,8 @@ const index = asyncWrapper(async (req, res) => {
         ]
       }
     ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+
   });
 
   return res
