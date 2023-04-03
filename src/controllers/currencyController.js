@@ -26,7 +26,6 @@ const currencyConvert = asyncWrapper ( async ( from , to , amount) => {
 
     
     if(baseCurrency.name.toString() == from.toString()) {
-      console.log(amount * toCurrency.rate);
         return amount * toCurrency.rate;
     }
     else {

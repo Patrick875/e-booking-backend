@@ -87,7 +87,7 @@ db.dbConnection;
 db.sequelize.sync({ force: false }).then(async () => {
   console.log("DB synced");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  croneJob.start()
+  // croneJob.start()
   // croneJob.stop();
 });
 

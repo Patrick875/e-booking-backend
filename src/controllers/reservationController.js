@@ -93,13 +93,14 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   }
 
   const amountObj = {}
+  console.log("before amount", amountObj)
   const convertedAmount = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.amount)
-  console.log(convertedAmount)
-  
+  console.log("after amount", convertedAmount)
+
   amountObj[req.body.currency] = req.body.amount
   amountObj.RWF = convertedAmount
 
-  console.log(amountObj)
+  console.log(amountObj, convertedAmount)
 
   const reservation = await Reservation.create({...req.body, amount : amountObj});
 
