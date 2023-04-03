@@ -93,14 +93,19 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   }
 
   const amountObj = {}
-  console.log("before amount", amountObj)
+  const paymentObj = {}
+
   const convertedAmount = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.amount)
-  console.log("after amount", convertedAmount)
+  const convertedPayment = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.payment)
+
 
   amountObj[req.body.currency] = req.body.amount
   amountObj.RWF = convertedAmount
 
-  const reservation = await Reservation.create({...req.body, amount : amountObj});
+  paymentObj[req.body.currency] = req.body.payment
+  paymentObj.RWF = convertedPayment
+
+  const reservation = await Reservation.create({...req.body, amount : amountObj, payment: paymentObj});
 
   Object.keys(req.body).forEach(async (key, val) => {
     let services = {};
