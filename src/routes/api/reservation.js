@@ -5,6 +5,7 @@ const routes = express.Router();
 
 routes.get('/all', reservationController.AllReservations);
 routes.post('/add', reservationController.CreateReservation);
+routes.post('/pay', reservationController.PayReservation);
 routes.put('/update', reservationController.UpdateReservation);
 routes.get('/:id', reservationController.GetReservation); 
 routes.delete('/delete/:id', reservationController.DeleteReservation); 

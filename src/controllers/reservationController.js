@@ -171,6 +171,12 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   return res.status(201).json({ status: "ok", data });
 });
 
+const PayReservation = asyncWrapper( async (req, res) => {
+  if(!req.params){
+    
+  }
+})
+
 const GetReservation = async (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: "id is required" });
 

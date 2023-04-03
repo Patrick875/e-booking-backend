@@ -51,7 +51,7 @@ attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'ve
     // Creates Secure Cookie with refresh token
     const expirationDate = new Date(Date.now() + 60 * 60 * 1000)
     res.cookie('accessToken', refreshToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
       sameSite: 'none',
       expiresIn: expirationDate,
@@ -61,7 +61,7 @@ attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'ve
 
     // Creates Secure Cookie with refresh token
     res.cookie('jwt', refreshToken, {
-      httpOnly: true,
+      httpOnly: false,
       secure: false,
       sameSite: 'None',
       expiresIn: expirationDate,
