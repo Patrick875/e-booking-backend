@@ -9,14 +9,10 @@ const apiKey = process.env.EXCHANGE_KEY;
 
 const encodedApiKey = encodeURIComponent(apiKey);
 
-const currencyJob = croneJob.schedule("* * * * *", async () => {
+const currencyJob = croneJob.schedule("0 0 * * *", async () => {
   const formattedDate = moment().format("YYYY-MM-DD");
 
   const isUpTodate = await Currency.findAll({ where: { date: formattedDate } });
-
-  console.log(isUpTodate)
-
-
   const options = {
     method: "GET",
     headers: {
@@ -34,8 +30,7 @@ const currencyJob = croneJob.schedule("* * * * *", async () => {
         const rates = response.data.rates;
         const base = response.data.base;
         for (let rate in response.data.rates) {
-          console.log(rate, response.data.date);
-
+           
           let currency = await Currency.findOne({ where: { name: rate } });
 
           if (currency) {

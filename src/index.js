@@ -53,16 +53,18 @@ app.use(cookieParser());
 app.use('/', home);
 app.use('/api/v1/login', loginRouter);
 app.use('/api/v1/refresh',refresh)
+
+app.use('/api/v1/roles', roleRouter);
+app.use('/api/v1/users', userRouter);
+
 // app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
-// app.use(verifyJWT)
+app.use(verifyJWT)
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);
 app.use('/api/v1/halls', hallRouter)
 app.use('/api/v1/customers', customersRouter);
 app.use('/api/v1/reservation', reservationRouter);
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/roles', roleRouter);
 app.use('/api/v1/products/category', productCategoryRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/services/category', serviceCategoryRouter);
