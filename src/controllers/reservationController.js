@@ -3,6 +3,7 @@ import {
   Customer,
   Room,
   Hall,
+  Role,
   User,
   HallService,
   ReservationService,
@@ -19,8 +20,9 @@ const AllReservations = asyncWrapper(async (req, res) => {
       { model: Hall, attributes: { exclude: ["createdAt", "updatedAt"] } },
       {
         model: User,
+        include: [{ model : Role , attributes: { exclude: ["createdAt", "updatedAt", "access", "permission"] } }],
         attributes: {
-          exclude: ["createdAt", "updatedAt", "refreshToken", "password"],
+          exclude: ["createdAt", "updatedAt", "refreshToken", "password", "roleId"],
         },
       },
       {
@@ -31,8 +33,8 @@ const AllReservations = asyncWrapper(async (req, res) => {
       },
       {
         model: ReservationTransaction,
-        attributes: { exclude: ["createdAt", "updated"]}
-      }
+        attributes: { exclude: ["createdAt", "updated"] },
+      },
     ],
   });
 
@@ -92,20 +94,31 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     }
   }
 
-  const amountObj = {}
-  const paymentObj = {}
+  const amountObj = {};
+  const paymentObj = {};
 
-  const convertedAmount = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.amount)
-  const convertedPayment = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.payment)
+  const convertedAmount = await currencyController.currencyConvert(
+    req.body.currency,
+    "RWF",
+    req.body.amount
+  );
+  const convertedPayment = await currencyController.currencyConvert(
+    req.body.currency,
+    "RWF",
+    req.body.payment
+  );
 
+  amountObj[req.body.currency] = req.body.amount;
+  amountObj.RWF = convertedAmount;
 
-  amountObj[req.body.currency] = req.body.amount
-  amountObj.RWF = convertedAmount
+  paymentObj[req.body.currency] = req.body.payment;
+  paymentObj.RWF = convertedPayment;
 
-  paymentObj[req.body.currency] = req.body.payment
-  paymentObj.RWF = convertedPayment
-
-  const reservation = await Reservation.create({...req.body, amount : amountObj, payment: paymentObj});
+  const reservation = await Reservation.create({
+    ...req.body,
+    amount: amountObj,
+    payment: paymentObj,
+  });
 
   Object.keys(req.body).forEach(async (key, val) => {
     let services = {};
@@ -134,7 +147,16 @@ const CreateReservation = asyncWrapper(async (req, res) => {
         model: Hall,
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
-      { model: User, attributes: { exclude: ["createdAt", "updatedAt", "refreshToken", "password"] } },
+      {
+        model: User,
+        include : [{
+          model : Role,
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+        }],
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "refreshToken", "password", "roleId"],
+        },
+      },
       {
         model: HallService,
         attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -190,7 +212,7 @@ const ChechOutReservation = async (req, res) => {
       .status(404)
       .json({ status: "error", message: "Reservation not found" });
 
-  reservation.update({ status: "out" });
+  await reservation.update({ status: "out" });
 
   return res.status(200).json({ status: "ok", data: reservation });
 };
@@ -205,12 +227,28 @@ const saveReservationTrans = asyncWrapper(async (reservationId, options) => {
     reservationId,
   });
 });
+const DeleteReservation = asyncWrapper ( async ( req, res ) => {
+  const id = req.params?.id;
+  if(!id) {
+    return res.status(400).json({ status: 'error', message: 'Reservation id is required'})
+  }
 
+  const reservation = await Reservation.findByPk(id)
+
+  if(!reservation) {
+    return res.status(404).json({ status: 'error', message: 'Reservation not found'})
+  }
+
+  await reservation.destroy();
+
+  return res.status(200).json({ status: 'success' , message: 'Reservation successfully deleted' })
+
+} )
 export default {
+  DeleteReservation,
   AllReservations,
   CreateReservation,
   UpdateReservation,
   ChechOutReservation,
   GetReservation,
-  
 };
