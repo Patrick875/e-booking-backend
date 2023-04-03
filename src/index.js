@@ -22,6 +22,7 @@ import hallRouter  from './routes/api/halls';
 import hallService from './routes/api/hallServices'
 import purchaseOrderRoutes from './routes/api/stockPurchaseOrder'
 import stockReceiveVoucherRoutes  from './routes/api/stockReceiveVoucher';
+import currencyRoutes from './routes/api/currency';
 
 
 import loginRouter from './routes/login';
@@ -29,15 +30,15 @@ import logoutRouter from './routes/logout';
 import refresh from './routes/refresh';
 
 import verifyJWT from './middleware/verifyJWT'
+import croneJob from './jobs/fetchCurrency'
 
 // import {swaggerDocRouter} from './docs';
-import db from "./models/index";
+import db from "./models";
 
 const app = express();
 dotenv.config();
 
 // Cross Origin Resource Sharing
-
 app.use(cors());
 
 // middleware
@@ -47,9 +48,11 @@ app.use(express.urlencoded({ extended: true }));
 //middleware for cookies
 app.use(cookieParser());
 
+// crone Job
+
 app.use('/', home);
 app.use('/api/v1/login', loginRouter);
-app.use('/api/v1',refresh)
+app.use('/api/v1/refresh',refresh)
 // app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
 // app.use(verifyJWT)
 
@@ -70,15 +73,7 @@ app.use('/api/v1/hall/services', hallService);
 app.use('/api/v1/purchase/order', purchaseOrderRoutes);
 app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 
-app.get('/setcookie', function(req, res) {
-  res.cookie('name', 'John Doe');
-  res.send('Cookie has been set');
-});
-
-app.get('/getcookie', function(req, res) {
-  const name = req.cookies.name;
-  res.send('The value of cookie "name" is: ' + name);
-});
+app.use('/api/v1/currency', currencyRoutes);
 
 app.use('/api/logout', logoutRouter);
 // app.use(swaggerDocRouter);
@@ -92,6 +87,8 @@ db.dbConnection;
 db.sequelize.sync({ force: false }).then(async () => {
   console.log("DB synced");
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  croneJob.start()
+  // croneJob.stop();
 });
 
 export default app;

@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Hall, { foreignKey: "hallId" });
       this.belongsTo(models.User, { foreignKey: "userId" });
       this.belongsTo(models.Customer, { foreignKey: "customerId" });
+      this.hasMany(models.ReservationTransaction, { foreignKey: "reservationId"})
       this.belongsToMany(models.HallService, {
         through: models.ReservationService,
       });

@@ -6,14 +6,8 @@ import {
  StockPurchaseOrderDetail,
  StockReceiveVoucherDetail
 } from "../../models";
-import stockpurchaseorderdetail from "../../models/stockpurchaseorderdetail";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
-//   date: DataTypes.DATE,
-//   status: DataTypes.STRING,
-//   userId: DataTypes.INTEGER,
-//   total: DataTypes.INTEGER,
-//   stockPurchaseOrderId: DataTypes.INTEGER
 const create = asyncWrapper(async (req, res) => {
   if (!req.body?.data || typeof req.body?.data != "object") {
     return res
@@ -72,14 +66,17 @@ const index = asyncWrapper(async (req, res) => {
     include: [
       {
         model: StockPurchaseOrder,
+        order: [['createdAt', 'DESC']],
         attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
             model: StockPurchaseOrderDetail,
+            order: [['createdAt', 'DESC']],
             attributes: { exclude: ["createdAt", "updatedAt"] },
             include: [
               {
                 model: StockItem,
+                order: [['createdAt', 'DESC']],
                 attributes: { exclude: ["createdAt", "updatedAt"] },
               },
             ],
@@ -91,6 +88,7 @@ const index = asyncWrapper(async (req, res) => {
         include: [
           {
             model: StockItem,
+            order: [['id', 'DESC']],
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],

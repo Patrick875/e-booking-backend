@@ -6,29 +6,40 @@ import {
   User,
   HallService,
   ReservationService,
+  ReservationTransaction,
 } from "../models";
-import { asyncWrapper } from '../utils/handlingTryCatchBlocks'
+import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
+import currencyController from "./currencyController";
 
-const AllReservations = asyncWrapper( async (req, res) => {
+const AllReservations = asyncWrapper(async (req, res) => {
   const data = await Reservation.findAll({
     include: [
       { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
       { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
       { model: Hall, attributes: { exclude: ["createdAt", "updatedAt"] } },
-      { model: User, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      {
+        model: User,
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "refreshToken", "password"],
+        },
+      },
       {
         model: HallService,
         attributes: {
-          exclude: ["createdAt", "updatedAt"]
+          exclude: ["createdAt", "updatedAt"],
         },
       },
-    ]
+      {
+        model: ReservationTransaction,
+        attributes: { exclude: ["createdAt", "updated"]}
+      }
+    ],
   });
 
   return res.status(200).json({ status: "ok", data });
 });
 
-const CreateReservation =asyncWrapper(  async (req, res) => {
+const CreateReservation = asyncWrapper(async (req, res) => {
   const validationArr = ["checkIn", "checkOut", "booking_type", "customerId"];
   let errors;
   let is_valid = true;
@@ -43,14 +54,11 @@ const CreateReservation =asyncWrapper(  async (req, res) => {
     return res.status(400).json({ error: `${errors} are required` });
   }
 
-  
-
   if (!req.body.roomId && !req.body.hallId && !req.body.details) {
     return res
       .status(400)
       .json({ error: "roomId, hallId and details can't both be empty" });
   }
-
 
   if (req.body?.roomId) {
     const room = await Room.findByPk(req.body.roomId);
@@ -65,46 +73,76 @@ const CreateReservation =asyncWrapper(  async (req, res) => {
     }
   }
 
-  if(req.body?.customerId){
+  if (req.body?.customerId) {
     const customer = await Customer.findByPk(req.body.customerId);
-    if(!customer){
-      return res.status(404).json({status: `error` , message: 'customer not found' })
+    if (!customer) {
+      return res
+        .status(404)
+        .json({ status: `error`, message: "customer not found" });
     }
-
   }
 
-  if(req.body?.userId){
+  if (req.body?.userId) {
     const user = await User.findByPk(req.body.userId);
-    
-    if(!user){
-      return res.status(404).json({status: 'error' , message: 'user not found'})
-    }
 
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "user not found" });
+    }
   }
 
+  const amountObj = {}
+  const convertedAmount = await currencyController.currencyConvert(req.body.currency, 'RWF', req.body.amount)
+  console.log(convertedAmount)
+  
+  amountObj[req.body.currency] = req.body.amount
+  amountObj.RWF = convertedAmount
 
-    const reservation = await Reservation.create(req.body);
+  console.log(amountObj)
 
-    Object.keys(req.body).forEach(async (key, val) => {
-      let services = {};
-      if (key.startsWith("service_")) {
-        services.HallServiceId = Number(key.split("_")[1]);
-        services.ReservationId = reservation.id;
-        services.quantity = req.body[key];
+  const reservation = await Reservation.create({...req.body, amount : amountObj});
 
-        let svces = await HallService.findByPk(Number(key.split("_")[1]));
-        if (svces) {
-          await ReservationService.create(services);
-        }
+  Object.keys(req.body).forEach(async (key, val) => {
+    let services = {};
+    if (key.startsWith("service_")) {
+      services.HallServiceId = Number(key.split("_")[1]);
+      services.ReservationId = reservation.id;
+      services.quantity = req.body[key];
+
+      let svces = await HallService.findByPk(Number(key.split("_")[1]));
+      if (svces) {
+        await ReservationService.create(services);
       }
-    });
+    }
+  });
 
-    const data = await Reservation.findByPk(reservation.id, {
-      include: [Customer, Room, Hall, User, HallService],
-    });
+  saveReservationTrans(reservation.id, req.body);
 
-    return res.status(201).json({ status: "ok", data });
- 
+  const data = await Reservation.findByPk(reservation.id, {
+    include: [
+      {
+        model: Customer,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      {
+        model: Hall,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      { model: User, attributes: { exclude: ["createdAt", "updatedAt", "refreshToken", "password"] } },
+      {
+        model: HallService,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      {
+        model: ReservationTransaction,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  });
+
+  return res.status(201).json({ status: "ok", data });
 });
 
 const GetReservation = async (req, res) => {
@@ -153,10 +191,21 @@ const ChechOutReservation = async (req, res) => {
   return res.status(200).json({ status: "ok", data: reservation });
 };
 
+const saveReservationTrans = asyncWrapper(async (reservationId, options) => {
+  await ReservationTransaction.create({
+    date: new Date(),
+    payment: options.payment,
+    paymentMethod: options.paymentMethod,
+    currency: options.currency,
+    reservationId,
+  });
+});
+
 export default {
   AllReservations,
   CreateReservation,
   UpdateReservation,
   ChechOutReservation,
   GetReservation,
+  
 };

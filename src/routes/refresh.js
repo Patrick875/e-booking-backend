@@ -3,6 +3,6 @@ import refreshTokenController from '../controllers/refreshTokenController';
 
 const router = express.Router();
 
-router.get('/refresh', refreshTokenController.handleRefreshToken);
+router.get('/', refreshTokenController.handleRefreshToken);
 
 export default router;
