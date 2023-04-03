@@ -172,10 +172,20 @@ const CreateReservation = asyncWrapper(async (req, res) => {
 });
 
 const PayReservation = asyncWrapper( async (req, res) => {
-  if(!req.params){
+  if(!req.params?.reservationId){
+    return res.status(400).json({ status: "error", message: " Reservation Id is required " });  }
+
+    if(!req.body?.amount || !req.body?.currency){
+      return res.status(400).json({ status: "error" , message: "The amount and currency is required" });
+    }
     
-  }
+    const reservation = await Reservation.findByPk(req.params.reservationId);
+    if(reservation) {
+      return res.status(404).json({status: "error", message: "Reservation not found in database"})
+    }
+    
 })
+
 
 const GetReservation = async (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: "id is required" });
@@ -253,6 +263,7 @@ const DeleteReservation = asyncWrapper ( async ( req, res ) => {
 export default {
   DeleteReservation,
   AllReservations,
+  PayReservation,
   CreateReservation,
   UpdateReservation,
   ChechOutReservation,
