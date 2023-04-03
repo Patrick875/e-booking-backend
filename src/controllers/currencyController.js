@@ -28,10 +28,10 @@ const currencyConvert =  async ( from , to , amount) => {
 
     
     if(baseCurrency.name.toString() == from.toString()) {
-        return amount * toCurrency.rate;
+        return parseFloat((amount * toCurrency.rate).toFixed(1)) ;
     }
     else {
-        return ( 1 / fromCurrency.rate ) * toCurrency.rate * amount;
+        return parseFloat((( 1 / fromCurrency.rate ) * toCurrency.rate * amount).toFixed(1));
     }
     
   } catch (error) {

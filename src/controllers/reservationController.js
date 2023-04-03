@@ -20,9 +20,22 @@ const AllReservations = asyncWrapper(async (req, res) => {
       { model: Hall, attributes: { exclude: ["createdAt", "updatedAt"] } },
       {
         model: User,
-        include: [{ model : Role , attributes: { exclude: ["createdAt", "updatedAt", "access", "permission"] } }],
+        include: [
+          {
+            model: Role,
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "access", "permission"],
+            },
+          },
+        ],
         attributes: {
-          exclude: ["createdAt", "updatedAt", "refreshToken", "password", "roleId"],
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "roleId",
+          ],
         },
       },
       {
@@ -149,12 +162,20 @@ const CreateReservation = asyncWrapper(async (req, res) => {
       },
       {
         model: User,
-        include : [{
-          model : Role,
-          attributes: { exclude: ["createdAt", "updatedAt"] },
-        }],
+        include: [
+          {
+            model: Role,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
         attributes: {
-          exclude: ["createdAt", "updatedAt", "refreshToken", "password", "roleId"],
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "roleId",
+          ],
         },
       },
       {
@@ -171,21 +192,80 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   return res.status(201).json({ status: "ok", data });
 });
 
-const PayReservation = asyncWrapper( async (req, res) => {
-  if(!req.params?.reservationId){
-    return res.status(400).json({ status: "error", message: " Reservation Id is required " });  }
+const PayReservation = asyncWrapper(async (req, res) => {
+  if (!req.body?.reservationId) {
+    return res
+      .status(400)
+      .json({ status: "error", message: " Reservation Id is required " });
+  }
 
-    if(!req.body?.amount || !req.body?.currency){
-      return res.status(400).json({ status: "error" , message: "The amount and currency is required" });
-    }
-    
-    const reservation = await Reservation.findByPk(req.params.reservationId);
-    if(reservation) {
-      return res.status(404).json({status: "error", message: "Reservation not found in database"})
-    }
-    
-})
+  if (!req.body?.payment || !req.body?.currency) {
+    console.log(req.body)
+    return res
+      .status(400)
+      .json({
+        status: "error",
+        message: "The payment amount and currency is required",
+      });
+  }
 
+  const reservation = await Reservation.findByPk(req.body.reservationId);
+  if (!reservation) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Reservation not found in database" });
+  }
+
+  if (!req.body.paymentMethod) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Payment Method is required" });
+  }
+
+  const transction = saveReservationTrans(req.body.reservationId, {...req.body, amount: parseInt(req.body.payment)});
+
+  let amountObj = reservation.amount;
+  let paymentObj = reservation.payment;
+
+  if (transction) {
+    let paymentCurrency = req.body.currency.toString();
+
+    if (paymentCurrency in paymentObj) {
+      paymentObj[paymentCurrency] =
+        paymentObj[paymentCurrency] + req.body.payment;
+      amountObj[paymentCurrency] =
+        amountObj[paymentCurrency] + req.body.payment;
+    } else {
+      paymentObj[paymentCurrency] = req.body.payment;
+      amountObj[paymentCurrency] = req.body.payment;
+
+      if (paymentObj[paymentCurrency] != "RWF") {
+        paymentObj.RWF =
+          paymentObj.RWF +
+          (await currencyController.currencyConvert(
+            req.body.currency,
+            "RWF",
+            req.body.payment
+          ));
+
+        amountObj.RWF = amountObj.RWF + (await currencyController.currencyConvert(req.body.currency, "RWF", req.body.payment))
+      }
+    }
+
+
+  }
+console.log(amountObj, paymentObj);
+
+  reservation.set({ amount: amountObj, payment: paymentObj })
+  await reservation.save()
+
+  return res
+    .status(200)
+    .json({
+      status: "success",
+      message: ` The amaunt ${req.body.payment} is paid for the reservation ${reservation.id} `,
+    });
+});
 
 const GetReservation = async (req, res) => {
   if (!req.params.id) return res.status(400).json({ error: "id is required" });
@@ -243,23 +323,28 @@ const saveReservationTrans = asyncWrapper(async (reservationId, options) => {
     reservationId,
   });
 });
-const DeleteReservation = asyncWrapper ( async ( req, res ) => {
+const DeleteReservation = asyncWrapper(async (req, res) => {
   const id = req.params?.id;
-  if(!id) {
-    return res.status(400).json({ status: 'error', message: 'Reservation id is required'})
+  if (!id) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Reservation id is required" });
   }
 
-  const reservation = await Reservation.findByPk(id)
+  const reservation = await Reservation.findByPk(id);
 
-  if(!reservation) {
-    return res.status(404).json({ status: 'error', message: 'Reservation not found'})
+  if (!reservation) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Reservation not found" });
   }
 
   await reservation.destroy();
 
-  return res.status(200).json({ status: 'success' , message: 'Reservation successfully deleted' })
-
-} )
+  return res
+    .status(200)
+    .json({ status: "success", message: "Reservation successfully deleted" });
+});
 export default {
   DeleteReservation,
   AllReservations,
