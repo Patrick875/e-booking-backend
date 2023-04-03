@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     verifiedAT: DataTypes.DATE,
     refreshToken: DataTypes.BLOB,
+    status: {
+      allowNull: false,
+      type : DataTypes.ENUM('ACTIVE', 'DISACTIVE'),
+      defaultValue: "ACTIVE",
+    },
     roleId: DataTypes.INTEGER
   }, {
     sequelize,

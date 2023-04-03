@@ -15,7 +15,9 @@ const index = asyncWrapper (async (req, res) => {
 });
 
 
-const currencyConvert = asyncWrapper ( async ( from , to , amount) => {
+const currencyConvert =  async ( from , to , amount) => {
+
+  try {
     const baseCurrency = await db.Currency.findOne({ where : {isbase : true }});
 
 
@@ -31,7 +33,13 @@ const currencyConvert = asyncWrapper ( async ( from , to , amount) => {
     else {
         return ( 1 / fromCurrency.rate ) * toCurrency.rate * amount;
     }
+    
+  } catch (error) {
+    console.log(error);
+    return false
+    
+  }
 
-} )
+} 
 
 export default { index, currencyConvert }

@@ -28,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       customerId: DataTypes.INTEGER,
       details: DataTypes.JSONB,
       userId: DataTypes.INTEGER,
-      amount: DataTypes.DECIMAL(10, 2),
-      payment: DataTypes.INTEGER,
+      amount: DataTypes.JSONB,
+      payment:DataTypes.JSONB,
       booking_date: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW

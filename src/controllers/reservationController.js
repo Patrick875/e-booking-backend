@@ -100,8 +100,6 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   amountObj[req.body.currency] = req.body.amount
   amountObj.RWF = convertedAmount
 
-  console.log(amountObj, convertedAmount)
-
   const reservation = await Reservation.create({...req.body, amount : amountObj});
 
   Object.keys(req.body).forEach(async (key, val) => {
@@ -198,6 +196,7 @@ const saveReservationTrans = asyncWrapper(async (reservationId, options) => {
     payment: options.payment,
     paymentMethod: options.paymentMethod,
     currency: options.currency,
+    amount: options.amount,
     reservationId,
   });
 });

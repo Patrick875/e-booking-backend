@@ -27,6 +27,11 @@ module.exports = {
         isEmail: true,
         allowNull: false,
       },
+      status: {
+        allowNull: false,
+        type : Sequelize.ENUM('ACTIVE', 'DISACTIVE'),
+        defaultValue: "ACTIVE",
+      },
       password: {
         type: Sequelize.STRING,
       },

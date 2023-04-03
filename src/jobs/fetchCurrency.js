@@ -38,7 +38,7 @@ const currencyJob = croneJob.schedule("* * * * *", async () => {
 
           let currency = await Currency.findOne({ where: { name: rate } });
 
-          if (currency.length) {
+          if (currency) {
             currency.set({ rate: rates[rate], date: response.data.date });
             await currency.save();
           } else {
