@@ -200,13 +200,11 @@ const PayReservation = asyncWrapper(async (req, res) => {
   }
 
   if (!req.body?.payment || !req.body?.currency) {
-    console.log(req.body)
-    return res
-      .status(400)
-      .json({
-        status: "error",
-        message: "The payment amount and currency is required",
-      });
+    console.log(req.body);
+    return res.status(400).json({
+      status: "error",
+      message: "The payment amount and currency is required",
+    });
   }
 
   const reservation = await Reservation.findByPk(req.body.reservationId);
@@ -222,7 +220,18 @@ const PayReservation = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "Payment Method is required" });
   }
 
-  const transction = saveReservationTrans(req.body.reservationId, {...req.body, amount: parseInt(req.body.payment)});
+
+  if (reservation.payment[req.body.currency] == undefined) {
+    return res.status(400).json({
+      status: "error",
+      message: "Payment currency should be the same",
+    });
+  }
+
+  const transction = saveReservationTrans(req.body.reservationId, {
+    ...req.body,
+    amount: parseInt(req.body.payment),
+  });
 
   let amountObj = reservation.amount;
   let paymentObj = reservation.payment;
@@ -231,40 +240,36 @@ const PayReservation = asyncWrapper(async (req, res) => {
     let paymentCurrency = req.body.currency.toString();
 
     if (paymentCurrency in paymentObj) {
-      paymentObj[paymentCurrency] =
-        paymentObj[paymentCurrency] + req.body.payment;
-      amountObj[paymentCurrency] =
-        amountObj[paymentCurrency] + req.body.payment;
-    } else {
-      paymentObj[paymentCurrency] = req.body.payment;
-      amountObj[paymentCurrency] = req.body.payment;
+      for (let key in paymentObj){
+        paymentObj[key] =
+        paymentObj[key] + (await currencyController.currencyConvert(
+          req.body.currency,
+          key,
+          req.body.payment
+        ));
 
-      if (paymentObj[paymentCurrency] != "RWF") {
-        paymentObj.RWF =
-          paymentObj.RWF +
-          (await currencyController.currencyConvert(
-            req.body.currency,
-            "RWF",
-            req.body.payment
-          ));
-
-        amountObj.RWF = amountObj.RWF + (await currencyController.currencyConvert(req.body.currency, "RWF", req.body.payment))
+        console.log(paymentObj[key])
       }
     }
-
-
+    else{
+      return res.status(400).json({
+        status: "error",
+        message: "Payment currency #",
+      })
+    }
+   
   }
-console.log(amountObj, paymentObj);
 
-  reservation.set({ amount: amountObj, payment: paymentObj })
-  await reservation.save()
+  await Reservation.update(
+    { amount: amountObj, payment: paymentObj },
+    { where: { id: req.body.reservationId } }
+  );
 
-  return res
-    .status(200)
-    .json({
-      status: "success",
-      message: ` The amaunt ${req.body.payment} is paid for the reservation ${reservation.id} `,
-    });
+  return res.status(200).json({
+    status: "success",
+    message: ` The amaunt ${req.body.payment} is paid for the reservation ${reservation.id} `,
+    data: reservation,
+  });
 });
 
 const GetReservation = async (req, res) => {

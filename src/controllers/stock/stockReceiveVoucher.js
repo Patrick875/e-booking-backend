@@ -22,7 +22,8 @@ const create = asyncWrapper(async (req, res) => {
     return acc + curr.price;
   }, 0);
 
-  const { data, stockPurchaseOrderId } = req.body;
+  const { data } = req.body;
+  const stockPurchaseOrderId = data[0].stockPurchaseOrderId
 
   const reveiveVoucher = await StockReceiveVoucher.create({
     date: new Date(),
