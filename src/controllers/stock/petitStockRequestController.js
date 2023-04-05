@@ -28,6 +28,7 @@ const create = asyncWrapper(async (req, res) => {
   });
 
   if (request) {
+    
     for (let element in request.body.data) {
       await PetitStockRequesitionDetail.create({
         itemValueId: element.itemValueId,

@@ -31,12 +31,6 @@ services:
       - shared-network
     volumes:
       - nps_data:/var/lib/postgresql/data
-  react-app:
-    build: ../Ebooking-front-end/e-booking
-    ports:
-      - "3000:3000"
-    depends_on:
-      - server
 volumes:
   nps_data:
 networks:
