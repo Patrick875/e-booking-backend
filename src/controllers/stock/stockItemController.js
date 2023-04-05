@@ -73,7 +73,7 @@ const stockBalance = asyncWrapper(async (req, res) => {
     include: [
       { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
     ],
-    attributes: { exclude: ["createdAt", "updatedAt"] }
+    attributes: { exclude: ["createdAt", "updatedAt","stockItemId"] }
   });
 
   return res.status(200).json({ status : 'success', message: 'stock balance', data })
