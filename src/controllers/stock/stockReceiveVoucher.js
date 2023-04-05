@@ -9,7 +9,7 @@ import {
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const create = asyncWrapper(async (req, res) => {
-  if (!req.body?.data || typeof req.body?.data != "object") {
+  if (!req.body?.data ) {
     return res
       .status(400)
       .json({

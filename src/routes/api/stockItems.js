@@ -7,6 +7,8 @@ routes.get('/all', stockItemController.GetItems);
 routes.post('/add', stockItemController.CreateItem);
 routes.put('/update', stockItemController.UpdateItem);
 routes.delete('/delete/:id', stockItemController.DeleteItem);
+routes.get('/balance', stockItemController.stockBalance)
 routes.get('/:id', stockItemController.GetItem);
+
 
 export default routes

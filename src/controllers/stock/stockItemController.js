@@ -1,14 +1,15 @@
-import { StockItem } from "../../models";
+import { StockItem, StockItemValue } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
-const CreateItem = asyncWrapper ( async (req, res) => {
-
-  const name = req.body.name
+const CreateItem = asyncWrapper(async (req, res) => {
+  const name = req.body.name;
   if (!req.body.name)
     return res.status(400).json({ message: "Name is required" });
 
-  if(await StockItem.findOne({ where : { name}})){
-    return res.status(409).json({status: 'error', message: `${name} is already saved`})
+  if (await StockItem.findOne({ where: { name } })) {
+    return res
+      .status(409)
+      .json({ status: "error", message: `${name} is already saved` });
   }
 
   const stock_item = await StockItem.create(req.body);
@@ -18,22 +19,26 @@ const CreateItem = asyncWrapper ( async (req, res) => {
 });
 
 const GetItem = asyncWrapper(async (req, res) => {
-
-  if(!req.params.id) return  res.status(400).json({ status: `error`, message : "Item Id required and should be a number "});
-  const item = await StockItem.findByPk(req.params.id)
-  if(!item) {
-    return res.status(404).json({status: 'error' , message: 'Item not found'})
+  if (!req.params.id)
+    return res
+      .status(400)
+      .json({
+        status: `error`,
+        message: "Item Id required and should be a number ",
+      });
+  const item = await StockItem.findByPk(req.params.id);
+  if (!item) {
+    return res.status(404).json({ status: "error", message: "Item not found" });
   }
-  return res.status(200).json({status: 'success' , data: item})
+  return res.status(200).json({ status: "success", data: item });
 });
 
-const GetItems =  asyncWrapper(  async (req, res) => {
-  const items = await StockItem.findAll({order: [["id", "DESC"]]});
-  return res.status(200).json({ status: "ok", data:items});
-
+const GetItems = asyncWrapper(async (req, res) => {
+  const items = await StockItem.findAll({ order: [["id", "DESC"]] });
+  return res.status(200).json({ status: "ok", data: items });
 });
 
-const UpdateItem = asyncWrapper (async (req, res) => {
+const UpdateItem = asyncWrapper(async (req, res) => {
   if (!req.body.id) return res.status(400).json({ message: "id is required " });
 
   const stock_item = await StockItem.findByPk(req.body.id);
@@ -45,15 +50,32 @@ const UpdateItem = asyncWrapper (async (req, res) => {
   stock_item.save();
   return res
     .status(200)
-    .json({ status: `ok`, message: " Stock Item updated successfully", data: stock_item });
+    .json({
+      status: `ok`,
+      message: " Stock Item updated successfully",
+      data: stock_item,
+    });
 });
 
 const DeleteItem = asyncWrapper(async (req, res) => {
-  if(!req.params.id) return res.status(400).json({ message: "id is required " });
+  if (!req.params.id)
+    return res.status(400).json({ message: "id is required " });
   const stock_item = await StockItem.findByPk(req.params.id);
-  if(!stock_item) return res.status(404).json({ message: " Item not found"});
+  if (!stock_item) return res.status(404).json({ message: " Item not found" });
   await stock_item.destroy();
-  return res.status(200).json({ status: `ok`, message: " Item deleted successfully" });
-})
+  return res
+    .status(200)
+    .json({ status: `ok`, message: " Item deleted successfully" });
+});
 
-export default { CreateItem, GetItem, GetItems, UpdateItem, DeleteItem };
+const stockBalance = asyncWrapper(async (req, res) => {
+  const data = await StockItemValue.findAll({
+    include: [
+      { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] }
+  });
+
+  return res.status(200).json({ status : 'success', message: 'stock balance', data })
+});
+export default { CreateItem, GetItem, GetItems, UpdateItem, DeleteItem ,stockBalance};
