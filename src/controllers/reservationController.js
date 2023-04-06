@@ -127,6 +127,10 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   paymentObj[req.body.currency] = req.body.payment;
   paymentObj.RWF = convertedPayment;
 
+  if(paymentObj.RWF >  amountObj.RWF  ){
+    return res.status(400).json({status: 'error', message: "Payment amaunt can't exceed possible amount RWF"})
+  }
+
   const reservation = await Reservation.create({
     ...req.body,
     amount: amountObj,
@@ -247,8 +251,6 @@ const PayReservation = asyncWrapper(async (req, res) => {
           key,
           req.body.payment
         ));
-
-        console.log(paymentObj[key])
       }
     }
     else{
@@ -258,6 +260,10 @@ const PayReservation = asyncWrapper(async (req, res) => {
       })
     }
    
+  }
+
+  if(paymentObj.RWF > amountObj.RWF){
+    return res.status(400).json({status: "error", message: "Payment amount can not go beyond the price of the service"})
   }
 
   await Reservation.update(
