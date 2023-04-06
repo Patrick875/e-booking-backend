@@ -23,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'ACTIVE',
     },
     userId: DataTypes.INTEGER,
-    total: DataTypes.INTEGER
+    total: DataTypes.INTEGER,
+    petitStockId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'PetitStockRequesition',

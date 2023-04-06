@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   PetitStockRequesitionDetail.init({
     itemValueId: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER,
+    quantity: DataTypes.FLOAT,
     petitStockrequestId: DataTypes.INTEGER
   }, {
     sequelize,

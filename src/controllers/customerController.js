@@ -1,3 +1,4 @@
+import { json } from "sequelize";
 import { Customer, Reservation, Room, Hall, RoomClass } from "../models";
 import { asyncWrapper } from '../utils/handlingTryCatchBlocks'
 const CreateCustomer = asyncWrapper(async (req, res) => {
@@ -50,24 +51,26 @@ const DeleteCustomer = asyncWrapper(async (req, res) => {
       .json({ status: `error`, message: `customer not found` });
   }
 
-  customer.update({ status: `deleted` });
+  customer.destroy();
+  
+  return res.status(200).json({ status: `success`, message: `customer destroyed` });
   //  To be completed
 });
 
 const UpdateCustomer = asyncWrapper(async (req, res) => {
-  if (!req.params.id) {
+  if (!req.body.id) {
     return res.status(400).json({
       status: `error`,
       message: `id is required to update a customer`,
     });
   }
 
-  const customer = await Customer.findByPk(req.params.id);
+  const customer = await Customer.findByPk(req.body.id);
 
   if (!customer) {
     return res.status(404).json({
       status: `error`,
-      message: `customer with id ${req.params.id} not found`,
+      message: `customer with id ${req.body.id} not found`,
     });
   }
 
