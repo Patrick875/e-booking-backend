@@ -49,6 +49,8 @@ app.use(express.urlencoded({ extended: true }));
 //middleware for cookies
 app.use(cookieParser());
 
+
+
 // crone Job
 
 app.use('/', home);
