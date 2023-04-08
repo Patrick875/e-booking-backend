@@ -20,7 +20,7 @@ const handleLogin = asyncWrapper(async (req, res) => {
     as: 'Role',
     attributes: { exclude : ['createdAt', 'updatedAt'] }
   },
-attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT' ]} });
+attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT', 'password']} });
   
   if (!user) return res.status(401).json({message : "user not registered"}); // Unauthorized
   // evaluate password
