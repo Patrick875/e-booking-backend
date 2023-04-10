@@ -7,13 +7,23 @@ const handleRefreshToken = asyncWrapper(async (req, res) => {
   if (!cookies?.jwt) return res.sendStatus(401);
   const refreshToken = cookies.jwt;
 
-  const user = await User.findOne({ where: { refreshToken },
+  const user = await User.findOne({
+    where: { refreshToken },
     include: {
-    model: Role,
-    as: 'Role',
-    attributes: { exclude : ['createdAt', 'updatedAt'] }
-  },
-attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT' , 'password']} });
+      model: Role,
+      as: "Role",
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    },
+    attributes: {
+      exclude: [
+        "createdAt",
+        "updatedAt",
+        "refreshToken",
+        "roleId",
+        "verifiedAT",
+      ],
+    },
+  });
 
   if (!user)
     return res.status(403).json({ status: "error", message: "Forbbiden" }); //Forbidden

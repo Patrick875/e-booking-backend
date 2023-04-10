@@ -20,7 +20,7 @@ const handleLogin = asyncWrapper(async (req, res) => {
     as: 'Role',
     attributes: { exclude : ['createdAt', 'updatedAt'] }
   },
-attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT', 'password']} });
+attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'verifiedAT']} });
   
   if (!user) return res.status(401).json({message : "user not registered"}); // Unauthorized
   // evaluate password
@@ -47,17 +47,7 @@ attributes: { exclude : ['createdAt', 'updatedAt', 'refreshToken', 'roleId' ,'ve
     user.refreshToken = refreshToken;
     await user.save();
 
-       
-    // Creates Secure Cookie with refresh token
-    const expirationDate = new Date(Date.now() + 60 * 60 * 1000)
-    res.cookie('accessToken', refreshToken, {
-      httpOnly: false,
-      secure: false,
-      sameSite: 'none',
-      expiresIn: expirationDate,
-      maxAge: 60 * 60 * 1000,
-    });
-
+    
 
     // Creates Secure Cookie with refresh token
     res.cookie('jwt', refreshToken, {
