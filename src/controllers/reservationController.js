@@ -13,7 +13,14 @@ import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 import currencyController from "./currencyController";
 
 const AllReservations = asyncWrapper(async (req, res) => {
-  const data = await Reservation.findAll({
+
+          // Set up pagination options
+          const page = req.query.page || 1;
+          const limit = req.query.limit || 10;
+          const offset = (page - 1) * limit;
+          
+
+  const dataItems = await Reservation.findAndCountAll({
     include: [
       { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
       { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -49,9 +56,29 @@ const AllReservations = asyncWrapper(async (req, res) => {
         attributes: { exclude: ["createdAt", "updated"] },
       },
     ],
+    limit,
+    offset,
   });
 
-  return res.status(200).json({ status: "ok", data });
+
+
+  // const totalPages = Math.ceil(dataItems.count / limit);
+  const currentPage = parseInt(page);
+  const itemsPerPage = parseInt(limit);
+
+  const totalItems = dataItems.count;
+const totalPages = Math.ceil(totalItems / limit);
+
+console.log(totalItems, itemsPerPage)
+
+  return res.status(200).json({ status: "ok", data : {
+    offset,
+    totalItems: dataItems.count,
+    totalPages,
+    currentPage,
+    itemsPerPage,
+    items: dataItems.rows
+  } });
 });
 
 const CreateReservation = asyncWrapper(async (req, res) => {
@@ -133,6 +160,7 @@ const CreateReservation = asyncWrapper(async (req, res) => {
 
   const reservation = await Reservation.create({
     ...req.body,
+    userId: req.user.id || req.userId,
     amount: amountObj,
     payment: paymentObj,
   });
@@ -204,7 +232,6 @@ const PayReservation = asyncWrapper(async (req, res) => {
   }
 
   if (!req.body?.payment || !req.body?.currency) {
-    console.log(req.body);
     return res.status(400).json({
       status: "error",
       message: "The payment amount and currency is required",

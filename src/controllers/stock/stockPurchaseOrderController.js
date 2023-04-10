@@ -18,10 +18,13 @@ const create = asyncWrapper(async (req, res) => {
   let total = req.body.order.reduce((acc, curr) => {
     return acc + curr.price;
   }, 0);
+  const user = req.user
+
+  console.log(user)
 
   const pOrder = await StockPurchaseOrder.create({
     date: new Date(),
-    userId: 1,
+    userId: user.id,
     total,
   });
 
@@ -95,4 +98,10 @@ const show = asyncWrapper( async (req, res) => {
   return res.status(200).json({status: 'success' , message: 'Successfull retrieval', data: data})
 
 })
-export default { create, index , show};
+
+const update = asyncWrapper ( async (req, res) => {
+
+  console.log(req.body)
+  
+} ) 
+export default { create, index , show, update};

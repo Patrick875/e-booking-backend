@@ -24,18 +24,17 @@ const create = asyncWrapper(async (req, res) => {
 
   const { data } = req.body;
   const stockPurchaseOrderId = data[0].stockPurchaseOrderId
+  const user = req.user
 
   const reveiveVoucher = await StockReceiveVoucher.create({
     date: new Date(),
-    userId: 1,
+    userId: user.id,
     stockPurchaseOrderId: stockPurchaseOrderId,
     total,
   });
 
   if (reveiveVoucher) {
     for (let element of data) {
-      console.log(element, data);
-
       let itemValue = await StockItemValue.findOne({
         where: { price: element.price, stockItemId: element.item_id },
       });

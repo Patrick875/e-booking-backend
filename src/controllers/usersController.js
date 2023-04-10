@@ -5,8 +5,11 @@ import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
 const getAllUsers = asyncWrapper(async (req, res) => {
   const users = await User.findAll(
-    { include: Role },
-    { exclude: ["password", "createdAt", "updatedAt"] }
+    { include: {model: Role,
+      attributes : { exclude: [ "createdAt", "updatedAt"] }
+    },
+    attributes : { exclude: ["password", "createdAt", "updatedAt", "refreshToken"] }
+  },
   );
   res.status(200).json({ message: "ok", users });
 });
