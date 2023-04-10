@@ -4,5 +4,6 @@ import petitStockRequestController from '../../controllers/stock/petitStockReque
 const routes = express.Router()
 
 routes.post('/order/add',petitStockRequestController.create )
+routes.get('/order/all',petitStockRequestController.index )
 
 export default routes
