@@ -50,7 +50,7 @@ const create = asyncWrapper(async (req, res) => {
     total,
     petitStockId: petit_stock.id,
   });
-  
+
   for (let element of data) {
 
 
@@ -114,4 +114,12 @@ const index = asyncWrapper(async (req, res) => {
   return res.status(200).json({ status: "success", data });
 });
 
-export default { create, index };
+const balance = asyncWrapper( async (  req, res ) => {
+
+  const data = await PetitStockItem.findAll({ include : [{ model : StockItem  } ]})
+
+  return res.status(200).json({ status : 'success', data })
+
+} )
+
+export default { create, index , balance };

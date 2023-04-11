@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasOne(models.StockPurchaseOrderDetail, { foreignKey: 'stockItemId' });
       this.hasOne(models.StockReceiveVoucherDetail, { foreignKey: 'stockItemId' });
-      this.hasMany(models.StockItemValue, { foreignKey: 'stockItemId' } )
+      this.hasMany(models.StockItemValue, { foreignKey: 'stockItemId' } );
+      this.hasOne(models.StockItem, { foreignKey: 'stockItemId'} )
       
     }
   }

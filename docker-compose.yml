@@ -13,8 +13,8 @@ services:
     networks:
       - shared-network
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/app/backend
+      - /app/backend/node_modules
     depends_on:
       - db
 
@@ -33,6 +33,9 @@ services:
       - nps_data:/var/lib/postgresql/data
   react-app:
     build: ../Ebooking-front-end/e-booking
+    volumes:
+      - /app/node_modules
+      - ../Ebooking-front-end/e-booking:/app
     ports:
       - "3000:3000"
     depends_on:
