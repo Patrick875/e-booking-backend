@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   ProductPackage.init({
-    price: DataTypes.INTEGER
+    price: DataTypes.INTEGER,
+    items: DataTypes.ARRAY(DataTypes.JSONB)
   }, {
     sequelize,
     modelName: 'ProductPackage',

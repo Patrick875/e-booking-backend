@@ -21,8 +21,6 @@ const CreateProduct = async (req, res) => {
       packages.ProductId = product.id;
       packages.price = req.body[key];
 
-      console.log(packages);
-
       let pkg = await Package.findByPk(Number(key.split("_")[1]));
       if (pkg) {
         await ProductPackage.create(packages);

@@ -269,7 +269,7 @@ const PayReservation = asyncWrapper(async (req, res) => {
     if (paymentCurrency in paymentObj) {
       for (let key in paymentObj){
         paymentObj[key] =
-        paymentObj[key] + (await currencyController.currencyConvert(
+        Number(paymentObj[key]) + Number(await currencyController.currencyConvert(
           req.body.currency,
           key,
           req.body.payment
