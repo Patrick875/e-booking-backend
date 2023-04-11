@@ -20,7 +20,8 @@ const AllReservations = asyncWrapper(async (req, res) => {
           const offset = (page - 1) * limit;
           
 
-  const dataItems = await Reservation.findAndCountAll({
+  // const dataItems = await Reservation.findAndCountAll({
+    const dataItems = await Reservation.findAll({
     include: [
       { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
       { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -55,9 +56,7 @@ const AllReservations = asyncWrapper(async (req, res) => {
         model: ReservationTransaction,
         attributes: { exclude: ["createdAt", "updated"] },
       },
-    ],
-    limit,
-    offset,
+    ]
   });
 
   // const totalPages = Math.ceil(dataItems.count / limit);
@@ -67,14 +66,15 @@ const AllReservations = asyncWrapper(async (req, res) => {
   const totalItems = dataItems.rows.length;
   const totalPages = Math.ceil(totalItems / limit);
 
-  return res.status(200).json({ status: "ok", data : {
-    offset,
-    totalItems,
-    totalPages,
-    currentPage,
-    itemsPerPage,
-    items: dataItems.rows
-  } });
+    return res.status(200).json({ status: "ok", data : data })
+  // return res.status(200).json({ status: "ok", data : {
+  //   offset,
+  //   totalItems,
+  //   totalPages,
+  //   currentPage,
+  //   itemsPerPage,
+  //   items: dataItems.rows
+  // } });
 });
 
 const CreateReservation = asyncWrapper(async (req, res) => {

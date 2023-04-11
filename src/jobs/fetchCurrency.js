@@ -9,7 +9,7 @@ const apiKey = process.env.EXCHANGE_KEY;
 
 const encodedApiKey = encodeURIComponent(apiKey);
 
-const currencyJob = croneJob.schedule("0 0 * * *", async () => {
+const currencyJob = croneJob.schedule("*/30 * * * *", async () => {
   const formattedDate = moment().format("YYYY-MM-DD");
 
   const isUpTodate = await Currency.findAll({ where: { date: formattedDate } });
