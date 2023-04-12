@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class ProductPackage extends Model {
     /**
@@ -13,13 +11,27 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  ProductPackage.init({
-    price: DataTypes.INTEGER,
-    items: DataTypes.ARRAY(DataTypes.JSONB)
-  }, {
-    sequelize,
-    modelName: 'ProductPackage',
-    tableName: 'ProductPackages'
-  });
+  ProductPackage.init(
+    {
+      price: DataTypes.INTEGER,
+      unit: DataTypes.STRING,
+      items: DataTypes.ARRAY(DataTypes.JSONB),
+    },
+    {
+      sequelize,
+      modelName: "ProductPackage",
+      tableName: "ProductPackages",
+      timestamps: false,
+      getters: true, // Include getters to transform the data when retrieving from the database
+      setters: false, // Exclude setters to transform the data when saving to the database
+    }
+  );
+  // Define a getter to transform the data when retrieving from the database
+  ProductPackage.prototype.toJSON = function () {
+    const values = { ...this.get() };
+    delete values.PackageId; // Exclude PackageId field
+    delete values.ProductId; // Exclude ProductId field
+    return values;
+  };
   return ProductPackage;
 };

@@ -30,11 +30,9 @@ const create = asyncWrapper(async (req, res) => {
         message: `Error the stock Item related to ${dataElement.itemValueId} does not exist`,
       });
     }
-    total = total + item.price * item.quantity;
+    total = total + Number(item.price * item.quantity);
   }
 
-
-      
   let petit_stock = await PetitStock.findOne({
     where: { name: req.body.data[0].petitStock },
   });
@@ -52,42 +50,31 @@ const create = asyncWrapper(async (req, res) => {
   });
 
   for (let element of data) {
-
-
     await PetitStockRequesitionDetail.create({
       itemValueId: element.itemValueId,
       quantity: element.quantity,
       petitStockrequestId: request.id,
     });
-
-    let item = await StockItemValue.findByPk(element.itemValueId, {
-      include: [{ model: StockItem }],
-    });
-
-    const petitStockItem = await PetitStockItem.findOne({
-      where: {
-        itemId: item.toJSON().StockItem.id,
-        petitstockId: petit_stock.id,
-      },
-    });
-    if (petitStockItem) {
-      petitStockItem.set({
-        quantity: petitStockItem.quantity + element.quantity,
-        avgPrice: element.quantity * item.price,
-      });
-      await petitStockItem.save();
-    } else {
-      await PetitStockItem.create({
-        quantity: element.quantity,
-        itemId: item.StockItem.id,
-        petitstockId: petit_stock.id,
-        avgPrice: element.quantity * item.price,
-      });
-    }
   }
+
+  const petitStockRequest = await PetitStockRequesition.findByPk(request.id, {
+    include: {
+      model: PetitStockRequesitionDetail,
+      include: {
+        model: StockItemValue,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    },
+  });
+
   return res
     .status(200)
-    .json({ status: "success", message: " Successfull Request Order sent " });
+    .json({
+      status: "success",
+      message: " Successfull Request Order sent ",
+      data: petitStockRequest,
+    });
 });
 
 const index = asyncWrapper(async (req, res) => {
@@ -98,28 +85,127 @@ const index = asyncWrapper(async (req, res) => {
         include: [
           {
             model: StockItemValue,
-            include: { model : StockItem, 
-              attributes: { exclude: ['createdAt', 'updatedAt']}
+            include: {
+              model: StockItem,
+              attributes: { exclude: ["createdAt", "updatedAt"] },
             },
-            attributes: { exclude: ["createdAt", "updatedAt", "petitStockrequestId"] },
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "petitStockrequestId"],
+            },
           },
         ],
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
-
   });
 
   return res.status(200).json({ status: "success", data });
 });
 
-const balance = asyncWrapper( async (  req, res ) => {
+const balance = asyncWrapper(async (req, res) => {
+  const data = await PetitStockItem.findAll({
+    include: [
+      { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
 
-  const data = await PetitStockItem.findAll({ include : [{ model : StockItem  } ]})
+  return res.status(200).json({ status: "success", data });
+});
 
-  return res.status(200).json({ status : 'success', data })
+const approve = asyncWrapper(async (req, res) => {
+  const { request } = req.body;
+  if (!request)
+    return res.status(404).json({
+      status: "error",
+      message: "The request is required",
+    });
 
+  let petitStock = await PetitStockRequesition.findByPk(request);
+
+  petitStock = petitStock.toJSON()
+
+  if (!petitStock)
+    return res.status(404).json({
+      status: "error",
+      message: "The request related to this Id not found",
+    });
+
+  for (let element of petitStock.PetitStockRequesitionDetails) {
+    let item = await StockItemValue.findByPk(element.itemValueId, {
+      include: [{ model: StockItem }],
+    });
+
+    const petitStockItem = await PetitStockItem.findOne({
+      where: {
+        itemId: item.toJSON().StockItem.id,
+        petitstockId: petitStock.petitStockId,
+      },
+    });
+
+    if (petitStockItem) {
+      petitStockItem.set({
+        quantity: petitStockItem.toJSON().quantity + element.quantity,
+        avgPrice: Number(element.quantity) * Number(item.price),
+      });
+      await petitStockItem.save();
+    } else {
+      await PetitStockItem.create({
+        quantity: Number(element.quantity),
+        itemId: item.StockItem.id,
+        petitstockId: petitStock.petitStockId,
+        avgPrice: Number(element.quantity) * Number(item.price),
+      });
+    }
+  }
+
+  return res.status(200).json({ status: 'OK', message: 'Request approved' });
+});
+
+const show = asyncWrapper ( async ( req, res ) => {
+  if(!req.params.id) {
+    return res.status(400).json({ status: 'error', message: ' Id is required'})
+  }
+
+  const data = await PetitStockRequesition.findByPk(req.params.id, {
+    include: [
+      {
+        model: PetitStockRequesitionDetail,
+        include: [
+          {
+            model: StockItemValue,
+            include: {
+              model: StockItem,
+              attributes: { exclude: ["createdAt", "updatedAt"] },
+            },
+            attributes: {
+              exclude: ["createdAt", "updatedAt", "petitStockrequestId"],
+            },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+
+return res.status(200).json({ status: 'Ok', data });
+})
+
+const destroy = asyncWrapper( async( req, res) => {
+  if( !req.params.id ){
+    return res.status(400).json({ status: 'error', message: 'Id is required'})
+  }
+
+const request = await PetitStockRequesition.findByPk(req.params.id);
+
+if(!request) {
+  return res.status(200).json({ status: 'success', message: "Request not found" });
+}
+
+await request.destroy();
+return res.status(200).json({ status: 'success', message: "Request successfully destroyed" });
 } )
 
-export default { create, index , balance };
+export default { create, index, balance, approve , show, destroy};

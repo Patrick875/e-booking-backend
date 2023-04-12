@@ -1,11 +1,14 @@
 import { Package, Product, ProductCategory } from "../models";
-import  {asyncWrapper } from '../utils/handlingTryCatchBlocks'
+import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
-const CreatePackage = asyncWrapper( async (req, res) => {
+const CreatePackage = asyncWrapper(async (req, res) => {
   if (!req.body.name || !req.body.category) {
     return res
       .status(400)
-      .json({ status: "error", message: "Package name and category is required" });
+      .json({
+        status: "error",
+        message: "Package name and category is required",
+      });
   }
 
   const category = await ProductCategory.findByPk(req.body.category);
@@ -26,7 +29,7 @@ const CreatePackage = asyncWrapper( async (req, res) => {
   });
 });
 
-const UpdatePackage = asyncWrapper ( async (req, res) => {
+const UpdatePackage = asyncWrapper(async (req, res) => {
   if (!req.body?.id)
     return res
       .status(400)
@@ -52,7 +55,7 @@ const UpdatePackage = asyncWrapper ( async (req, res) => {
   });
 });
 
-const DeletePackage = asyncWrapper ( async (req, res) => {
+const DeletePackage = asyncWrapper(async (req, res) => {
   if (!req.params?.id) {
     return res
       .status(400)
@@ -75,7 +78,7 @@ const DeletePackage = asyncWrapper ( async (req, res) => {
   });
 });
 
-const GetPackage = asyncWrapper( async (req, res) => {
+const GetPackage = asyncWrapper(async (req, res) => {
   if (!req.params?.id) {
     return res
       .status(400)
@@ -90,7 +93,17 @@ const GetPackage = asyncWrapper( async (req, res) => {
 const GetPackages = asyncWrapper(async (req, res) => {
   const packages = await Package.findAll({
     order: [["id", "DESC"]],
-    include: [Product, ProductCategory],
+    include: [
+      {
+        model: Product,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      {
+        model: ProductCategory,
+        attributes: { exclude: ["createdAt", "updatedAt", "categoryId"] },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt", "categoryId"] },
   });
   return res.status(200).json({ status: "ok", data: packages });
 });

@@ -16,11 +16,9 @@ const create = asyncWrapper(async (req, res) => {
   }
 
   let total = req.body.order.reduce((acc, curr) => {
-    return acc + curr.price;
+    return acc + (curr.price) * curr.quantity;
   }, 0);
   const user = req.user
-
-  console.log(user)
 
   const pOrder = await StockPurchaseOrder.create({
     date: new Date(),

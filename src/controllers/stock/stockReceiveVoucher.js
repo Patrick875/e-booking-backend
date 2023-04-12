@@ -45,13 +45,16 @@ const create = asyncWrapper(async (req, res) => {
           price: element.price,
           stockItemId: element.item_id,
         });
+      }else{
+        itemValue.set({quantity: Number(itemValue.quantity + element.quantity)})
+        await itemValue.save();
       }
 
       let stockDetail = await StockReceiveVoucherDetail.create({
         stockItemId: element.item_id,
         stockReceiveVoucherId: reveiveVoucher.id,
-        receivedQuantity: element.quantity,
-        unitPrice: element.price,
+        receivedQuantity: Number(element.quantity),
+        unitPrice: Number(element.price),
       });
     }
   }
