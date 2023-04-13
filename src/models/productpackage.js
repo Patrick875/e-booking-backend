@@ -26,12 +26,6 @@ module.exports = (sequelize, DataTypes) => {
       setters: false, // Exclude setters to transform the data when saving to the database
     }
   );
-  // Define a getter to transform the data when retrieving from the database
-  ProductPackage.prototype.toJSON = function () {
-    const values = { ...this.get() };
-    delete values.PackageId; // Exclude PackageId field
-    delete values.ProductId; // Exclude ProductId field
-    return values;
-  };
+  
   return ProductPackage;
 };

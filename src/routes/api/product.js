@@ -8,5 +8,6 @@ routes.post('/add', productController.CreateProduct);
 routes.put('/update', productController.UpdateProduct);
 routes.delete('/delete/:id', productController.DeleteProduct);
 routes.get('/:id', productController.GetProductById);
+routes.post('/package/sell', productController.sell)
 
 export default routes;
