@@ -5,6 +5,7 @@ import {
   ProductPackage,
   PetitStockSale,
   PetitStock,
+  User,
   PetitStockSaleDetail,
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
@@ -187,12 +188,10 @@ const sell = asyncWrapper(async (req, res) => {
   let amount = 0;
   for (let element of req.body.packages) {
     if (!(await PetitStock.findOne({ where: { name: element.petitStock } }))) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: `no stock named ${element.petitStock}`,
-        });
+      return res.status(400).json({
+        status: "error",
+        message: `no stock named ${element.petitStock}`,
+      });
     }
 
     // let pkg = await ProductPackage.findOne({include : [ { model : Product}, { model: Package, where : { id :  }} ] })
@@ -201,12 +200,10 @@ const sell = asyncWrapper(async (req, res) => {
     });
 
     if (!pkg) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          message: ` Package related to ${element.packageId} not found`,
-        });
+      return res.status(404).json({
+        status: "error",
+        message: ` Package related to ${element.packageId} not found`,
+      });
     }
     let productOne = pkg.toJSON().Products.filter((prod) => {
       console.log(prod.id, element.productId);
@@ -256,6 +253,63 @@ const sell = asyncWrapper(async (req, res) => {
     .json({ status: "success", data, message: "Successfully Product sold" });
 });
 
+const allSalles = asyncWrapper(async (req, res) => {
+  const data = await PetitStockSale.findAll({
+    include: [
+      {
+        model: PetitStockSaleDetail,
+        include: [
+          {
+            model: Package,
+            include: [
+              {
+                model: Product,
+                attributes: { exclude: ["createdAt", "updatedAt"] },
+              },
+            ],
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "packageId", "petitStockSaleId"],
+        },
+      },
+      {
+        model: PetitStock,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      {
+        model: User,
+        attributes: { exclude: ["createdAt", "updatedAt", "refreshToken", "password", "verifiedAT"] },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+
+  console.log(data);
+
+  let newData = data.map((element) => {
+    return {
+      ...element,
+      PetitStockSaleDetails: element.PetitStockSaleDetails.map((details) => {
+        return {
+          ...details,
+          Package: {
+            ...details.Package,
+            Products: details.Package.Products.filter(
+              (prod => ( prod.id == details.productId))
+            )[0],
+          },
+        };
+      }),
+    };
+  });
+
+  return res
+    .status(200)
+    .json({ status: "success", data , message: "All sales" });
+});
+
 export default {
   CreateProduct,
   UpdateProduct,
@@ -263,4 +317,5 @@ export default {
   GetAllProducts,
   GetProductById,
   sell,
+  allSalles,
 };
