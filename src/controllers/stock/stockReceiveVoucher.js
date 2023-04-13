@@ -19,7 +19,7 @@ const create = asyncWrapper(async (req, res) => {
       });
   }
   let total = req.body.data.reduce((acc, curr) => {
-    return acc + curr.price;
+    return acc + Number(curr.price * curr.quantity);
   }, 0);
 
   const { data } = req.body;
@@ -41,8 +41,8 @@ const create = asyncWrapper(async (req, res) => {
 
       if (!itemValue) {
         itemValue = await StockItemValue.create({
-          quantity: element.quantity,
-          price: element.price,
+          quantity: Number(element.quantity),
+          price: Number(element.price),
           stockItemId: element.item_id,
         });
       }else{
@@ -104,4 +104,19 @@ const index = asyncWrapper(async (req, res) => {
   return res.status(200).json({ status: "success", data });
 });
 
-export default { create, index };
+const destroy = asyncWrapper( async (req, res) => {
+  if(!req.params?.id){
+    return res.status(400).json( { status: "error", message: "Id is required" });
+  }
+  const row  = await StockReceiveVoucher.findByPk(req.params.id)
+
+  if(!row) {
+    return res.status(404).json({ status: "error", message: " Voucher not found"}) 
+  }
+
+  await row.destroy();
+
+  return res.status(200).json({ status: "success" , message: "Voucher deleted successfully"});
+})
+
+export default { create, index, destroy };

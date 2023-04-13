@@ -141,8 +141,25 @@ const GetProductById = asyncWrapper ( async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Product id is required" });
 
-  const product = await Product.findByPk(req.params.id);
+  const product = await Product.findByPk(req.params.id,{
+
+    include: [
+      {
+        model: Package,
+        include: [
+          {
+            model: ProductCategory,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "updatedAt", "PackageId", "ProductId", "categoryId"] },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+
+  });
   if (!product) {
+    
     return res
       .status(404)
       .json({ status: "error", message: "Product not found" });

@@ -38,6 +38,7 @@ const create = asyncWrapper(async (req, res) => {
         currentQuantity:itemValue ?  itemValue.quantity : 0,
         requestQuantity: element.quantity,
         unitPrice: element.price,
+        unit: element.unit
 
       });
 
@@ -86,7 +87,6 @@ const show = asyncWrapper( async (req, res) => {
           {
             model: StockItem,
             attributes: { exclude : ["createdAt", "updatedAt"] },
-    
           }
         ]
       }
@@ -98,8 +98,30 @@ const show = asyncWrapper( async (req, res) => {
 })
 
 const update = asyncWrapper ( async (req, res) => {
-
-  console.log(req.body)
+  if(!req.body?.id) {
+    return res.status(400).json({status: 'error', message :' Id is required ' });
+  }
   
+  const data = await StockPurchaseOrder.findByPk(req.body.id)
+
+  if(!data){
+    return res.status(404).json({status: 'error', message: ' Id related to a stock order is required not found'});
+  }
+  
+  data.set(re.body)
+  data.save()
+  return res.status(200).json({status: 'success' , message: 'Successfully Order updated'});
 } ) 
-export default { create, index , show, update};
+
+const destroy = asyncWrapper( async (req, res) => {
+  if(!req.params?.id){
+    return res.status(400).json({status: 'error', message: 'Id is required'});
+  }
+  const row  = await StockPurchaseOrder.findByPk(req.params.id)
+  if(!row){
+    return res.status(400).json({status: 'error', message: 'Order not found'});
+  }
+  await row.destroy();
+  return res.status(200).json({status: 'success' , message: 'Order successfully deleted'});
+})
+export default { create, index , show, update, destroy};
