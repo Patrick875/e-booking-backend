@@ -413,4 +413,5 @@ export default {
   GetProductById,
   sell,
   allSalles,
+  approve
 };
