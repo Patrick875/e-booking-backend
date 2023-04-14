@@ -154,15 +154,14 @@ const approve = asyncWrapper(async (req, res) => {
 
     if (petitStockItem) {
 
-
       petitStockItem.set({
-        quantity: Number(petitStockItem.toJSON().quantity) + Number(element.quantity),
+        quantinty: Number((petitStockItem.toJSON().quantity) != null ? petitStockItem.toJSON().quantity : 0 ) + Number(element.quantity),
         avgPrice: Number(element.quantity) * Number(item.price),
       });
       await petitStockItem.save();
     } else {
       await PetitStockItem.create({
-        quantity: Number(element.quantity),
+        quantinty: Number(element.quantity),
         itemId: item.StockItem.id,
         petitstockId: petitStock.petitStockId,
         avgPrice: Number(element.quantity) * Number(item.price),
