@@ -63,10 +63,10 @@ const AllReservations = asyncWrapper(async (req, res) => {
   const currentPage = parseInt(page);
   const itemsPerPage = parseInt(limit);
 
-  const totalItems = dataItems.rows.length;
-  const totalPages = Math.ceil(totalItems / limit);
+  // const totalItems = dataItems.rows.length;
+  // const totalPages = Math.ceil(totalItems / limit);
 
-    return res.status(200).json({ status: "ok", data : data })
+    return res.status(200).json({ status: "ok", data : dataItems })
   // return res.status(200).json({ status: "ok", data : {
   //   offset,
   //   totalItems,

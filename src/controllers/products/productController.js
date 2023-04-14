@@ -8,6 +8,7 @@ import {
   User,
   PetitStockSaleDetail,
 } from "../../models";
+import CircularJSON from 'circular-json'
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateProduct = asyncWrapper(async (req, res) => {
@@ -206,7 +207,6 @@ const sell = asyncWrapper(async (req, res) => {
       });
     }
     let productOne = pkg.toJSON().Products.filter((prod) => {
-      console.log(prod.id, element.productId);
       return Number(prod.id) == Number(element.productId);
     });
 
@@ -217,8 +217,6 @@ const sell = asyncWrapper(async (req, res) => {
   const petitStockRow = await PetitStock.findOne({
     where: { name: req.body.packages[0].petitStock },
   });
-
-  console.log(petitStockRow);
 
   const petitStockSale = await PetitStockSale.create({
     status: "PENDING",
@@ -280,34 +278,79 @@ const allSalles = asyncWrapper(async (req, res) => {
       },
       {
         model: User,
-        attributes: { exclude: ["createdAt", "updatedAt", "refreshToken", "password", "verifiedAT"] },
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
       },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-  console.log(data);
 
-  let newData = data.map((element) => {
+  let newData = [];
+  let newArray = [];
+  for (let item of data) {
+    let details = [];
+
+    let detail = item.PetitStockSaleDetails.map((el) => ({
+      ...el.toJSON(),
+      Package: {
+        ...el.toJSON().Package,
+        Products: el
+          .toJSON()
+          .Package.Products.find((prod) => prod.id == el.productId)[0],
+      },
+    }));
+
+    let { PetitStockSaleDetails, ...otherKeys } = item;
+
+    details.push(detail);
+    newData.push({ ...otherKeys });
+
+  }
+
+    
+  newArray = data.map((item) => ({
+    id: item.dataValues.id,
+    date: item.dataValues.date,
+    petiStockId: item.dataValues.petiStockId,
+    userId: item.dataValues.userId,
+    amount: item.dataValues.amount,
+    status: item.dataValues.status,
+    petitStockSaleDetails: item.dataValues.PetitStockSaleDetails,
+    petitStock: item.PetitStock.dataValues,
+    user: item.User.dataValues,
+  }));
+
+
+  const filteredData = newArray.map(item => {
+    const filteredProducts = item.petitStockSaleDetails.map(detail => {
+      const filteredPackages = detail.toJSON().Package.Products.find(product => {
+        return product.id == detail.toJSON().productId;
+      });
+      return {
+        ...(detail.toJSON()),
+        Package: {
+          ...detail.toJSON().Package,
+          Products: filteredPackages,
+        },
+      };
+    });
     return {
-      ...element,
-      PetitStockSaleDetails: element.PetitStockSaleDetails.map((details) => {
-        return {
-          ...details,
-          Package: {
-            ...details.Package,
-            Products: details.Package.Products.filter(
-              (prod => ( prod.id == details.productId))
-            )[0],
-          },
-        };
-      }),
+      ...item,
+      petitStockSaleDetails: filteredProducts,
     };
   });
 
   return res
     .status(200)
-    .json({ status: "success", data , message: "All sales" });
+    .json({ status: "success", data: filteredData, message: "All sales" });
 });
 
 export default {
