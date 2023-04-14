@@ -73,7 +73,7 @@ const CreateProduct = asyncWrapper(async (req, res) => {
 });
 
 const UpdateProduct = asyncWrapper(async (req, res) => {
-  if (!req.body.id) {
+  if (!req.body.productId) {
     return res
       .status(404)
       .json({ status: "error", message: "Product not found" });
@@ -85,9 +85,44 @@ const UpdateProduct = asyncWrapper(async (req, res) => {
       .status(404)
       .json({ status: "error", message: "Product not found" });
 
+
+  for (let element of req.body.packages) {
+
+  const product = Product.findByPk(req.body.id, {  });
+  if (!product)
+    return res
+      .status(404)
+      .json({ status: "error", message: "Product not found" });
+
+
+    await ProductPackage.create({
+      ProductId: product.id,
+      PackageId: element.packageId,
+      price: element.price,
+      items: element.items,
+      unit: element.unit,
+    });
+  }
+  const data = await Product.findByPk(product.id, {
+    include: [
+      {
+        model: Package,
+        include: [
+          {
+            model: ProductCategory,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  });
+
+
   product.set({
     name: req.body.name ? req.body.name : product.name,
   });
+
 
   await product.save();
 
@@ -353,6 +388,23 @@ const allSalles = asyncWrapper(async (req, res) => {
     .json({ status: "success", data: filteredData, message: "All sales" });
 });
 
+const approve = asyncWrapper( async (req , res) => {
+  if( !req.body.id){
+    return res.status(400).json({ status: 'error', message: 'Id is required'})
+  }
+
+  const petitSales = await PetitStockSale.findByPk(req.body.id)
+
+  if(!petitSales) {
+    return res.status.json( { status: 'error', message: "There is no sales related to Id" } )
+  }
+
+  petitSales.set({ status : 'COMFIRMED'})
+  await petitSales.save()
+
+  return res.status(200).json( { status:'success', message: "succesffuly confirmed"  })
+
+})
 export default {
   CreateProduct,
   UpdateProduct,

@@ -171,7 +171,6 @@ const approve = asyncWrapper(async (req, res) => {
 
   await PetitStockItem.update({ status: "APPROVED" }, { where :{ id: request.id }});
 
-
   return res
     .status(200)
     .json({ status: "OK", message: "Request approved", data: petitStock });
