@@ -393,7 +393,7 @@ const approve = asyncWrapper( async (req , res) => {
     return res.status(400).json({ status: 'error', message: 'Id is required'})
   }
 
-  const petitSales = await PetitStockSale.findByPk(req.body.id)
+  const petitSales = await PetitStockSale.findByPk(req.body.id, )
 
   if(!petitSales) {
     return res.status.json( { status: 'error', message: "There is no sales related to Id" } )
@@ -402,7 +402,7 @@ const approve = asyncWrapper( async (req , res) => {
   petitSales.set({ status : 'COMFIRMED'})
   await petitSales.save()
 
-  return res.status(200).json( { status:'success', message: "succesffuly confirmed"  })
+  return res.status(200).json( { status:'success', message: "succesffuly confirmed",   })
 
 })
 export default {

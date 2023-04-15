@@ -25,7 +25,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: '',
+          model: 'Reservations',
           key : 'id',
           onDelete: 'RESTRICT',
           onUpdate: 'CASCADE',

@@ -19,13 +19,25 @@ module.exports = {
         type: Sequelize.FLOAT
       },
       accountType: {
-        type: Sequelize.ENUM
+        type: Sequelize.ENUM('debit','credit')
       },
       doneBy: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          key: 'id',
+          model: 'Users',
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE'
+        }
       },
       doneTo: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          key: 'id',
+          model: 'Users',
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE'
+        }
       },
       status: {
         type: Sequelize.STRING

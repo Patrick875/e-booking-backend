@@ -10,10 +10,22 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       petitStockSaleId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          key: 'id',
+          model: 'petitStockSales',
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE',
+        }
       },
       packageId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          key: 'id',
+          model: 'Package',
+          onDelete: 'RESTRICT',
+          onUpdate: 'CASCADE'
+        }
       },
       quantity: {
         type: Sequelize.INTEGER

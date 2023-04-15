@@ -24,6 +24,7 @@ import purchaseOrderRoutes from './routes/api/stockPurchaseOrder'
 import stockReceiveVoucherRoutes  from './routes/api/stockReceiveVoucher';
 import currencyRoutes from './routes/api/currency'
 import petitStockRoutes  from './routes/api/petitStock'
+import cashFlowRouters from './routes/api/cashFolows'
 
 
 import loginRouter from './routes/login';
@@ -78,6 +79,7 @@ app.use('/api/v1/hall/services', hallService);
 app.use('/api/v1/purchase/order', purchaseOrderRoutes);
 app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 app.use('/api/v1/petitstock', petitStockRoutes)
+app.use('/api/v1/cashflow', cashFlowRouters)
 
 app.use('/api/v1/currency', currencyRoutes);
 

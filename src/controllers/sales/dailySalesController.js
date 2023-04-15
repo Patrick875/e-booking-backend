@@ -37,4 +37,4 @@ const destroy = asyncWrapper( async ( req, res ) => {
     await result.destroy()
     return res.status(200).json({staus: 'success' , message: 'Successfully deleted record'})
 })
-export default { create, index, update}
+export default { create, index, update }

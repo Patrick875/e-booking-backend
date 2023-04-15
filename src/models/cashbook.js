@@ -11,13 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.User, { foreignKey : 'doneTo'})
+      this.belongsTo(models.User, { foreignKey : 'doneBy'})
     }
   }
   CashBook.init({
+    prevBalance: DataTypes.FLOAT,
+    newBalance: DataTypes.FLOAT,
     date: DataTypes.DATEONLY,
     description: DataTypes.STRING,
     amount: DataTypes.FLOAT,
-    accountType: DataTypes.ENUM('debit', 'credit'),
+    accountType: DataTypes.ENUM('DEBIT', 'CREDIT'),
     doneBy: DataTypes.INTEGER,
     doneTo: DataTypes.INTEGER,
     status: DataTypes.STRING
