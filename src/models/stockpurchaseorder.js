@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     date: DataTypes.DATE,
     status: {
       type: DataTypes.STRING,
-      defaultValue: 'ACTIVE',
+      defaultValue: 'PENDING',
 
     },
     userId: DataTypes.INTEGER,
