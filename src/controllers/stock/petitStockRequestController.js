@@ -172,9 +172,19 @@ const approve = asyncWrapper(async (req, res) => {
         avgPrice: Number(element.quantity) * Number(item.price),
       });
     }
+
+    let stockItem =  await StockItemValue.findByPk(element.StockItemValue.id);
+    if(stockItem){
+      stockItem.set({quantity : Number(stockItem.quantity) - Number(element.quantity)})
+      await stockItem.save();
+    }
+  
+
   }
 
-  await PetitStockItem.update(
+
+
+  await PetitStockRequesition.update(
     { status: "APPROVED" },
     { where: { id: request.id } }
   );

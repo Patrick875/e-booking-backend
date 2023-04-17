@@ -130,6 +130,14 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     }
   }
 
+  if(req.body.packages && req.body.packages.length) {
+    for( let pack of req.body.packages) {
+      if(req.body.packages) {
+   
+      }
+    }
+  }
+
   const amountObj = {};
   const paymentObj = {};
 
@@ -175,6 +183,15 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     }
   });
 
+
+  if(req.body.packages && req.body.packages.length) {
+    for( let pack of req.body.packages) {
+      if(req.body.packages) {
+   
+      }
+    }
+  }
+
   saveReservationTrans(reservation.id, req.body);
 
   const data = await Reservation.findByPk(reservation.id, {
@@ -216,7 +233,6 @@ const CreateReservation = asyncWrapper(async (req, res) => {
       },
     ],
   });
-
   return res.status(201).json({ status: "ok", data });
 });
 

@@ -287,6 +287,7 @@ const sell = asyncWrapper(async (req, res) => {
 });
 
 const allSalles = asyncWrapper(async (req, res) => {
+
   const data = await PetitStockSale.findAll({
     include: [
       {
@@ -393,7 +394,7 @@ const approve = asyncWrapper( async (req , res) => {
     return res.status(400).json({ status: 'error', message: 'Id is required'})
   }
 
-  const petitSales = await PetitStockSale.findByPk(req.body.id, )
+  const petitSales = await PetitStockSale.findByPk(req.body.id )
 
   if(!petitSales) {
     return res.status.json( { status: 'error', message: "There is no sales related to Id" } )
@@ -401,6 +402,120 @@ const approve = asyncWrapper( async (req , res) => {
 
   petitSales.set({ status : 'COMFIRMED'})
   await petitSales.save()
+
+  const data = await PetitStockSale.findByPk( req.body.id ,{
+    include: [
+      {
+        model: PetitStockSaleDetail,
+        include: [
+          {
+            model: Package,
+            include: [
+              {
+                model: Product,
+                attributes: { exclude: ["createdAt", "updatedAt"] },
+              },
+            ],
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: {
+          exclude: ["createdAt", "updatedAt", "packageId", "petitStockSaleId"],
+        },
+      },
+      {
+        model: PetitStock,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+      {
+        model: User,
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
+
+
+  let newData = [];
+  let newArray = [];
+  for (let item of data) {
+    let details = [];
+
+    let detail = item.PetitStockSaleDetails.map((el) => ({
+      ...el.toJSON(),
+      Package: {
+        ...el.toJSON().Package,
+        Products: el
+          .toJSON()
+          .Package.Products.find((prod) => prod.id == el.productId)[0],
+      },
+    }));
+
+    let { PetitStockSaleDetails, ...otherKeys } = item;
+
+    details.push(detail);
+    newData.push({ ...otherKeys });
+
+  }
+
+    
+  newArray = data.map((item) => ({
+    id: item.dataValues.id,
+    date: item.dataValues.date,
+    petiStockId: item.dataValues.petiStockId,
+    userId: item.dataValues.userId,
+    amount: item.dataValues.amount,
+    status: item.dataValues.status,
+    petitStockSaleDetails: item.dataValues.PetitStockSaleDetails,
+    petitStock: item.PetitStock.dataValues,
+    user: item.User.dataValues,
+  }));
+
+
+  const filteredData = newArray.map(item => {
+    const filteredProducts = item.petitStockSaleDetails.map(detail => {
+      const filteredPackages = detail.toJSON().Package.Products.find(product => {
+        return product.id == detail.toJSON().productId;
+      });
+      return {
+        ...(detail.toJSON()),
+        Package: {
+          ...detail.toJSON().Package,
+          Products: filteredPackages,
+        },
+      };
+    });
+    return {
+      ...item,
+      petitStockSaleDetails: filteredProducts,
+    };
+  });
+
+  // petitstockId: DataTypes.INTEGER,
+  // itemId: DataTypes.INTEGER,
+  // quantinty: DataTypes.INTEGER,
+  // unit: DataTypes.STRING,
+  // avgPrice: DataTypes.FLOAT
+
+  if(data){
+    for(let itemsTodedudct of data.petitStockSaleDetails.Package.Products.ProductPackage.items){
+      let petitStockItem = petitStockItem.findOne({ where : { petitstockId : data.petiStockId , itemId : itemsTodedudct.itemId} });
+      if(petitStockItem){
+        petitStockItem.set({quantinty :  Number( petitStockItem.quantinty) - Number(itemsTodedudct.quantity) })
+      }
+
+    }
+    itemId
+  }
+
 
   return res.status(200).json( { status:'success', message: "succesffuly confirmed",   })
 
