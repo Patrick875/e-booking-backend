@@ -31,13 +31,8 @@ module.exports = {
         }
       },
       doneTo: {
-        type: Sequelize.INTEGER,
-        references: {
-          key: 'id',
-          model: 'Users',
-          onDelete: 'RESTRICT',
-          onUpdate: 'CASCADE'
-        }
+        type: Sequelize.STRING,
+       
       },
       status: {
         type: Sequelize.STRING

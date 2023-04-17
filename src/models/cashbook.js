@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     amount: DataTypes.FLOAT,
     accountType: DataTypes.ENUM('DEBIT', 'CREDIT'),
     doneBy: DataTypes.INTEGER,
-    doneTo: DataTypes.INTEGER,
+    doneTo: DataTypes.STRING,
     status: DataTypes.STRING
   }, {
     sequelize,
