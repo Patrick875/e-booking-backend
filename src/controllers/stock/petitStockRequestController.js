@@ -104,6 +104,10 @@ const balance = asyncWrapper(async (req, res) => {
   const data = await PetitStockItem.findAll({
     include: [
       { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      {
+        model: PetitStock,
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
@@ -127,10 +131,7 @@ const approve = asyncWrapper(async (req, res) => {
       },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
-
   });
-
-
 
   if (!petitStock)
     return res.status(404).json({
@@ -138,13 +139,13 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The request related to this Id not found",
     });
 
-    petitStock = petitStock.toJSON();
+  petitStock = petitStock.toJSON();
 
   for (let element of petitStock.PetitStockRequesitionDetails) {
     let item = await StockItemValue.findByPk(element.itemValueId, {
       include: [{ model: StockItem }],
     });
-    
+
     const petitStockItem = await PetitStockItem.findOne({
       where: {
         itemId: item.toJSON().StockItem.id,
@@ -153,9 +154,13 @@ const approve = asyncWrapper(async (req, res) => {
     });
 
     if (petitStockItem) {
-
       petitStockItem.set({
-        quantinty: Number((petitStockItem.toJSON().quantity) != null ? petitStockItem.toJSON().quantity : 0 ) + Number(element.quantity),
+        quantinty:
+          Number(
+            petitStockItem.toJSON().quantity != null
+              ? petitStockItem.toJSON().quantity
+              : 0
+          ) + Number(element.quantity),
         avgPrice: Number(element.quantity) * Number(item.price),
       });
       await petitStockItem.save();
@@ -169,7 +174,10 @@ const approve = asyncWrapper(async (req, res) => {
     }
   }
 
-  await PetitStockItem.update({ status: "APPROVED" }, { where :{ id: request.id }});
+  await PetitStockItem.update(
+    { status: "APPROVED" },
+    { where: { id: request.id } }
+  );
 
   return res
     .status(200)
@@ -227,4 +235,8 @@ const destroy = asyncWrapper(async (req, res) => {
     .json({ status: "success", message: "Request successfully destroyed" });
 });
 
-export default { create, index, balance, approve, show, destroy };
+const getPetitStocks = asyncWrapper( async (req, res ) => {
+  const data = await PetitStock.findAll({})
+  return res.status(200).json({ status: "success", message: 'all petit stocks', data})
+})
+export default { create, index, balance, approve, show, destroy , getPetitStocks};
