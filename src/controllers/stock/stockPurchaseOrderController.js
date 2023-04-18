@@ -111,12 +111,10 @@ const update = asyncWrapper(async (req, res) => {
   const data = await StockPurchaseOrder.findByPk(req.body.id);
 
   if (!data) {
-    return res
-      .status(404)
-      .json({
-        status: "error",
-        message: " Id related to a stock order is required not found",
-      });
+    return res.status(404).json({
+      status: "error",
+      message: " Id related to a stock order is required not found",
+    });
   }
 
   data.set(re.body);
@@ -209,22 +207,45 @@ const approve = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Id is required " });
   }
 
-  const order = await StockPurchaseOrder.findByPk(req.body.orderId);
+  const order = await StockPurchaseOrder.findByPk(req.body.orderId, {
+    include: [
+      {
+        model: StockPurchaseOrderDetail,
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "stockPurchaseOrderId",
+            "stockItemId",
+          ],
+        },
+        include: [
+          {
+            model: StockItem,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
   if (!order) {
     return res
       .status(404)
       .json({ status: "error", message: " Order not found" });
   }
 
+  if(order){
   order.set({ status: "APPROVED" });
   await order.save();
-  return res
-    .status(200)
-    .json({
-      status: "success",
-      message: "Successfully order approved",
-      data: order,
-    });
+
+  }
+
+  return res.status(200).json({
+    status: "success",
+    message: "Successfully order approved",
+    data: order,
+  });
 });
 
 export default {

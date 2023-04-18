@@ -154,11 +154,12 @@ const approve = asyncWrapper(async (req, res) => {
     });
 
     if (petitStockItem) {
+
       petitStockItem.set({
         quantinty:
           Number(
-            petitStockItem.toJSON().quantity != null
-              ? petitStockItem.toJSON().quantity
+            petitStockItem.toJSON().quantinty != null
+              ? petitStockItem.toJSON().quantinty
               : 0
           ) + Number(element.quantity),
         avgPrice: Number(element.quantity) * Number(item.price),
@@ -173,20 +174,19 @@ const approve = asyncWrapper(async (req, res) => {
       });
     }
 
-    let stockItem =  await StockItemValue.findByPk(element.StockItemValue.id);
+
+
+    let stockItem =  await StockItemValue.findByPk(element.id);
+    
     if(stockItem){
       stockItem.set({quantity : Number(stockItem.quantity) - Number(element.quantity)})
       await stockItem.save();
     }
-  
-
   }
-
-
 
   await PetitStockRequesition.update(
     { status: "APPROVED" },
-    { where: { id: request.id } }
+    { where: { id: request } }
   );
 
   return res
@@ -246,7 +246,7 @@ const destroy = asyncWrapper(async (req, res) => {
 });
 
 const getPetitStocks = asyncWrapper( async (req, res ) => {
-  const data = await PetitStock.findAll({})
+  const data = await PetitStock.findAll({attributes :{ exclude : ['createdAt', 'updatedAt'] }})
   return res.status(200).json({ status: "success", message: 'all petit stocks', data})
 })
 export default { create, index, balance, approve, show, destroy , getPetitStocks};
