@@ -7,8 +7,9 @@ import {
   PetitStock,
   User,
   PetitStockSaleDetail,
+  PetitStockItem
 } from "../../models";
-import CircularJSON from 'circular-json'
+import CircularJSON from "circular-json";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateProduct = asyncWrapper(async (req, res) => {
@@ -85,15 +86,12 @@ const UpdateProduct = asyncWrapper(async (req, res) => {
       .status(404)
       .json({ status: "error", message: "Product not found" });
 
-
   for (let element of req.body.packages) {
-
-  const product = Product.findByPk(req.body.id, {  });
-  if (!product)
-    return res
-      .status(404)
-      .json({ status: "error", message: "Product not found" });
-
+    const product = Product.findByPk(req.body.id, {});
+    if (!product)
+      return res
+        .status(404)
+        .json({ status: "error", message: "Product not found" });
 
     await ProductPackage.create({
       ProductId: product.id,
@@ -118,11 +116,9 @@ const UpdateProduct = asyncWrapper(async (req, res) => {
     ],
   });
 
-
   product.set({
     name: req.body.name ? req.body.name : product.name,
   });
-
 
   await product.save();
 
@@ -328,7 +324,6 @@ const allSalles = asyncWrapper(async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-
   let newData = [];
   let newArray = [];
   for (let item of data) {
@@ -348,10 +343,8 @@ const allSalles = asyncWrapper(async (req, res) => {
 
     details.push(detail);
     newData.push({ ...otherKeys });
-
   }
 
-    
   newArray = data.map((item) => ({
     id: item.dataValues.id,
     date: item.dataValues.date,
@@ -364,14 +357,15 @@ const allSalles = asyncWrapper(async (req, res) => {
     user: item.User.dataValues,
   }));
 
-
-  const filteredData = newArray.map(item => {
-    const filteredProducts = item.petitStockSaleDetails.map(detail => {
-      const filteredPackages = detail.toJSON().Package.Products.find(product => {
-        return product.id == detail.toJSON().productId;
-      });
+  const filteredData = newArray.map((item) => {
+    const filteredProducts = item.petitStockSaleDetails.map((detail) => {
+      const filteredPackages = detail
+        .toJSON()
+        .Package.Products.find((product) => {
+          return product.id == detail.toJSON().productId;
+        });
       return {
-        ...(detail.toJSON()),
+        ...detail.toJSON(),
         Package: {
           ...detail.toJSON().Package,
           Products: filteredPackages,
@@ -389,21 +383,26 @@ const allSalles = asyncWrapper(async (req, res) => {
     .json({ status: "success", data: filteredData, message: "All sales" });
 });
 
-const approve = asyncWrapper( async (req , res) => {
-  if( !req.body.id){
-    return res.status(400).json({ status: 'error', message: 'Id is required'})
+const approve = asyncWrapper(async (req, res) => {
+
+  if (!req.body.id) {
+    return res.status(400).json({ status: "error", message: "Id is required" });
   }
 
-  const petitSales = await PetitStockSale.findByPk(req.body.id )
+  const petitSales = await PetitStockSale.findByPk(req.body.id);
 
-  if(!petitSales) {
-    return res.status.json( { status: 'error', message: "There is no sales related to Id" } )
+  if (!petitSales) {
+    return res.status.json({
+      status: "error",
+      message: "There is no sales related to Id",
+    });
   }
 
-  petitSales.set({ status : 'COMFIRMED'})
-  await petitSales.save()
+  petitSales.set({ status: "COMFIRMED" });
+  await petitSales.save();
 
-  const data = await PetitStockSale.findByPk( req.body.id ,{
+
+  const data = await PetitStockSale.findAll({
     include: [
       {
         model: PetitStockSaleDetail,
@@ -441,8 +440,10 @@ const approve = asyncWrapper( async (req , res) => {
       },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
+    where : {
+      id : req.body.id
+    }
   });
-
 
   let newData = [];
   let newArray = [];
@@ -463,10 +464,8 @@ const approve = asyncWrapper( async (req , res) => {
 
     details.push(detail);
     newData.push({ ...otherKeys });
-
   }
 
-    
   newArray = data.map((item) => ({
     id: item.dataValues.id,
     date: item.dataValues.date,
@@ -479,14 +478,15 @@ const approve = asyncWrapper( async (req , res) => {
     user: item.User.dataValues,
   }));
 
-
-  const filteredData = newArray.map(item => {
-    const filteredProducts = item.petitStockSaleDetails.map(detail => {
-      const filteredPackages = detail.toJSON().Package.Products.find(product => {
-        return product.id == detail.toJSON().productId;
-      });
+  const filteredData = newArray.map((item) => {
+    const filteredProducts = item.petitStockSaleDetails.map((detail) => {
+      const filteredPackages = detail
+        .toJSON()
+        .Package.Products.find((product) => {
+          return product.id == detail.toJSON().productId;
+        });
       return {
-        ...(detail.toJSON()),
+        ...detail.toJSON(),
         Package: {
           ...detail.toJSON().Package,
           Products: filteredPackages,
@@ -499,27 +499,27 @@ const approve = asyncWrapper( async (req , res) => {
     };
   });
 
-  // petitstockId: DataTypes.INTEGER,
-  // itemId: DataTypes.INTEGER,
-  // quantinty: DataTypes.INTEGER,
-  // unit: DataTypes.STRING,
-  // avgPrice: DataTypes.FLOAT
 
-  if(data){
-    for(let itemsTodedudct of data.petitStockSaleDetails.Package.Products.ProductPackage.items){
-      let petitStockItem = petitStockItem.findOne({ where : { petitstockId : data.petiStockId , itemId : itemsTodedudct.itemId} });
-      if(petitStockItem){
-        petitStockItem.set({quantinty :  Number( petitStockItem.quantinty) - Number(itemsTodedudct.quantity) })
+  for(let itemsTodeduct of filteredData[0].petitStockSaleDetails){
+
+    for ( let item of itemsTodeduct.Package.Products.ProductPackage.items){
+
+      let petitStock = await PetitStockItem.findOne({ where :{ itemId : item.itemId, petitstockId : filteredData[0].petiStockId }});
+
+    
+
+      if( petitStock ){
+        petitStock.set( { quantinty : petitStock.quantinty - item.quantity })
+        petitStock.save();
       }
-
     }
-    itemId
+
   }
 
-
-  return res.status(200).json( { status:'success', message: "succesffuly confirmed",   })
-
-})
+  return res
+    .status(200)
+    .json({ status: "success", message: "succesffuly confirmed", data : filteredData[0] });
+});
 export default {
   CreateProduct,
   UpdateProduct,
@@ -528,5 +528,5 @@ export default {
   GetProductById,
   sell,
   allSalles,
-  approve
+  approve,
 };
