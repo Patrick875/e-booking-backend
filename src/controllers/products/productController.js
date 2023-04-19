@@ -506,10 +506,9 @@ const approve = asyncWrapper(async (req, res) => {
 
       let petitStock = await PetitStockItem.findOne({ where :{ itemId : item.itemId, petitstockId : filteredData[0].petiStockId }});
 
-    
 
       if( petitStock ){
-        petitStock.set( { quantinty : petitStock.quantinty - item.quantity })
+        petitStock.set( { quantinty : petitStock.quantinty - item.quantity * itemsTodeduct.quantity })
         petitStock.save();
       }
     }
