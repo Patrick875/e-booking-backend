@@ -117,14 +117,14 @@ const sell = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Service not found" });
   }
 
-  const serviceTransaction = await serviceTransaction.create({
+  const serviceTran = await ServiceTransaction.create({
     client_name,
     serviceId,
     total: service.price,
     userId: req.user.id
   });
 
-  return response.status( { status: "success", message : 'sold successfully' , data: serviceTransaction} )
+  return res.status(200).json( { status: "success", message : 'sold successfully' , data: serviceTran} )
 
   
 });
