@@ -10,7 +10,7 @@ const debit = asyncWrapper(async (req, res) => {
   if (!req.body.doneTo) {
     return res.status(400).json({
       status: "error",
-      message: "The ID of who carries the money is required",
+      message: "The user who carries the money is required",
     });
   }
 
@@ -21,13 +21,6 @@ const debit = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "The account is required" });
   }
 
-  const userDoneTo = await User.findByPk(req.body.doneTo);
-
-  if (!userDoneTo)
-    return res.status(404).json({
-      status: "error",
-      message: `The user associated to id ${req.body.doneTo} is not found `,
-    });
 
   const { account, amount, description, doneTo } = req.body;
 
