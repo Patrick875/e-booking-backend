@@ -111,7 +111,7 @@ const GetAllCustomers = asyncWrapper(async (req, res) => {
         },
       ],
       attributes: { exclude: ["createdAt", "updatedAt"] },
-      order: ['createdAt', 'DESC']
+      order: [['createdAt', 'DESC']]
 
     },
     );

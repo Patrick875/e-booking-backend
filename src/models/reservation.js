@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.HallService, {
         through: models.ReservationService,
       });
+      this.hasMany( models.PetitStockReservation, { foreignKey : 'reservationId'})
+
     }
   }
   Reservation.init(

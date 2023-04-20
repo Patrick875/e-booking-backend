@@ -58,8 +58,11 @@ const AllReservations = asyncWrapper(async (req, res) => {
         model: ReservationTransaction,
         attributes: { exclude: ["createdAt", "updated"] },
       },
+      {
+        model : PetitStockReservation
+      }
     ],
-    order : ['createdAt', 'DESC']
+    order : [['createdAt', 'DESC']]
   });
 
   // const totalPages = Math.ceil(dataItems.count / limit);

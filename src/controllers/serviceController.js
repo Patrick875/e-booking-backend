@@ -151,7 +151,7 @@ const allSells = asyncWrapper(async (req, res) => {
       model: Service
     }
   ],
-  order: ['createdAt', 'DESC']
+  order: [['createdAt', 'DESC']]
   });
   return res.status(200).json({ status: "success", data });
 });

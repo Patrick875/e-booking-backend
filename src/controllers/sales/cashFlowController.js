@@ -53,6 +53,7 @@ const debit = asyncWrapper(async (req, res) => {
   return res.status(200).json({
     status: "success",
     message: `Success ${amount} Debited on ${accountInfo.name} account `,
+    balance: accountInfo
   });
 });
 
@@ -116,10 +117,13 @@ const credit = asyncWrapper(async (req, res) => {
     status: "success",
     message: `Success ${amount} Credited from ${accountInfo.name} account `,
     data: cash_flow,
+    balance: accountInfo
   });
 });
 
 const cashFlows = asyncWrapper(async (req, res) => {
+  let accountInfo =  await Account.findOne( { where : { name : 'CASH' }});
+
   const data = await CashFlow.findAll({
     include: [
       {
@@ -137,6 +141,6 @@ const cashFlows = asyncWrapper(async (req, res) => {
     ],
   });
 
-  return res.status(200).json({ status: "success", data });
+  return res.status(200).json({ status: "success", data, balance: accountInfo });
 });
 export default { credit, debit, cashFlows };
