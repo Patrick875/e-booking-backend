@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.Role, {foreignKey : 'roleId'});
       User.hasMany(models.Reservation, {foreignKey : 'userId'});
       this.hasOne(models.CashBook, {foreignKey : 'doneBy'});
+      this.hasOne ( models.ServiceTransaction, {foreignKey : 'userId' })
 
     }
   }
