@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Reservation, {foreignKey : 'userId'});
       this.hasOne(models.CashFlow, {foreignKey : 'doneBy'});
       this.hasOne ( models.ServiceTransaction, {foreignKey : 'userId' })
-      this.hasMany( models.DailyCash, { foreignKey : 'carriedBy' } )
-      this.hasMany( models.DailyCash, { foreignKey : 'receivedBy'})
+      this.hasMany( models.DailyMoney, { foreignKey : 'carriedBy' } )
+      this.hasMany( models.DailyMoney, { foreignKey : 'receivedBy'})
     }
   }
   User.init({

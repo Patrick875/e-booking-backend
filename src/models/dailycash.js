@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class DailyCash extends Model {
+  class DailyMoney extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo( models.User, { foreignKey : 'receivedBy'})
     }
   }
-  DailyCash.init({
+  DailyMoney.init({
     amount: DataTypes.DECIMAL(10, 2),
-    paymentMethod: DataTypes.DECIMAL(10, 2),
+    paymentMethod: DataTypes.STRING,
     currency: DataTypes.STRING,
     date: DataTypes.DATE,
     title: DataTypes.STRING,
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     receivedBy: DataTypes.INTEGER,
   }, {
     sequelize,
-    modelName: 'DailyCash',
+    modelName: 'DailyMoney',
   });
-  return DailyCash;
+  return DailyMoney;
 };
