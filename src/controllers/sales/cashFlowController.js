@@ -13,11 +13,7 @@ const debit = asyncWrapper(async (req, res) => {
       message: "The ID of who carries the money is required",
     });
   }
-  if (!req.body.description) {
-    return res
-      .status(200)
-      .json({ status: "error", message: "The description is required" });
-  }
+
 
   if (!req.body.account) {
     return res
