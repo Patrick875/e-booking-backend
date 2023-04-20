@@ -1,4 +1,4 @@
-import { Service, ServiceCategory, ServiceTransaction } from "../models";
+import { Service, ServiceCategory, ServiceTransaction, User } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
 const CreateService = asyncWrapper(async (req, res) => {
@@ -101,12 +101,10 @@ const sell = asyncWrapper(async (req, res) => {
   }
 
   if (!client_name) {
-    return res
-      .status(400)
-      .json({
-        status: "error",
-        message: " Client name not specified or empty",
-      });
+    return res.status(400).json({
+      status: "error",
+      message: " Client name not specified or empty",
+    });
   }
 
   const service = await Service.findByPk(serviceId);
@@ -117,23 +115,41 @@ const sell = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Service not found" });
   }
 
-  const serviceTransaction = await serviceTransaction.create({
+  const serviceTran = await ServiceTransaction.create({
     client_name,
     serviceId,
+    status: 'PENDING',
     total: service.price,
-    userId: req.user.id
+    userId: req.user.id,
   });
 
-  return response.status( { status: "success", message : 'sold successfully' , data: serviceTransaction} )
-
-  
+  return res
+    .status(200)
+    .json({
+      status: "success",
+      message: "sold successfully",
+      data: serviceTran,
+    });
 });
 
 const allSells = asyncWrapper(async (req, res) => {
+  const data = await ServiceTransaction.findAll({
 
-  const data = await ServiceTransaction.findAll( {} );
-  return res.status(200).json( { status: 'success', data })
-  
+  include : [{
+    model: User,
+    attributes: {
+      exclude: [
+        "createdAt",
+        "updatedAt",
+        "refreshToken",
+        "password",
+        "verifiedAT",
+      ],
+    }}
+  ]
+
+  });
+  return res.status(200).json({ status: "success", data });
 });
 
 export default {

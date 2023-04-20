@@ -8,20 +8,20 @@ import {
   HallService,
   ReservationService,
   ReservationTransaction,
+  Product,
+  Package,
 } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 import currencyController from "./currencyController";
 
 const AllReservations = asyncWrapper(async (req, res) => {
-
-          // Set up pagination options
-          const page = req.query.page || 1;
-          const limit = req.query.limit || 10;
-          const offset = (page - 1) * limit;
-          
+  // Set up pagination options
+  const page = req.query.page || 1;
+  const limit = req.query.limit || 10;
+  const offset = (page - 1) * limit;
 
   // const dataItems = await Reservation.findAndCountAll({
-    const dataItems = await Reservation.findAll({
+  const dataItems = await Reservation.findAll({
     include: [
       { model: Customer, attributes: { exclude: ["createdAt", "updatedAt"] } },
       { model: Room, attributes: { exclude: ["createdAt", "updatedAt"] } },
@@ -56,7 +56,7 @@ const AllReservations = asyncWrapper(async (req, res) => {
         model: ReservationTransaction,
         attributes: { exclude: ["createdAt", "updated"] },
       },
-    ]
+    ],
   });
 
   // const totalPages = Math.ceil(dataItems.count / limit);
@@ -66,7 +66,7 @@ const AllReservations = asyncWrapper(async (req, res) => {
   // const totalItems = dataItems.rows.length;
   // const totalPages = Math.ceil(totalItems / limit);
 
-    return res.status(200).json({ status: "ok", data : dataItems })
+  return res.status(200).json({ status: "ok", data: dataItems });
   // return res.status(200).json({ status: "ok", data : {
   //   offset,
   //   totalItems,
@@ -130,10 +130,19 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     }
   }
 
-  if(req.body.packages && req.body.packages.length) {
-    for( let pack of req.body.packages) {
-      if(req.body.packages) {
-   
+  if (req.body.packages && req.body.packages.length) {
+    for (let pack of req.body.packages) {
+      let product = await Product.findByPk(pack.productId, {
+        include: [{ model: Package, where: { id: pack.packageId } }],
+      });
+
+      if (!product) {
+        return res
+          .status(404)
+          .json({
+            status: "error",
+            message: "Product not found or not associated with a package",
+          });
       }
     }
   }
@@ -158,8 +167,11 @@ const CreateReservation = asyncWrapper(async (req, res) => {
   paymentObj[req.body.currency] = req.body.payment;
   paymentObj.RWF = convertedPayment;
 
-  if(paymentObj.RWF >  amountObj.RWF  ){
-    return res.status(400).json({status: 'error', message: "Payment amaunt can't exceed possible amount RWF"})
+  if (paymentObj.RWF > amountObj.RWF) {
+    return res.status(400).json({
+      status: "error",
+      message: "Payment amaunt can't exceed possible amount RWF",
+    });
   }
 
   const reservation = await Reservation.create({
@@ -183,12 +195,16 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     }
   });
 
-
-  if(req.body.packages && req.body.packages.length) {
-    for( let pack of req.body.packages) {
-      if(req.body.packages) {
-   
-      }
+  if (req.body.packages && req.body.packages.length) {
+    for (let pack of req.body.packages) {
+      await PetitStockReservation.create({
+        packageId: pack.packageId,
+        productId: pack.productId,
+        quantity: pack.quantity,
+        status: "PENDING",
+        reservationId: reservation.id,
+        petitStockItemId: pack.petitStockId,
+      });
     }
   }
 
@@ -263,7 +279,6 @@ const PayReservation = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "Payment Method is required" });
   }
 
-
   if (reservation.payment[req.body.currency] == undefined) {
     return res.status(400).json({
       status: "error",
@@ -283,26 +298,30 @@ const PayReservation = asyncWrapper(async (req, res) => {
     let paymentCurrency = req.body.currency.toString();
 
     if (paymentCurrency in paymentObj) {
-      for (let key in paymentObj){
+      for (let key in paymentObj) {
         paymentObj[key] =
-        Number(paymentObj[key]) + Number(await currencyController.currencyConvert(
-          req.body.currency,
-          key,
-          req.body.payment
-        ));
+          Number(paymentObj[key]) +
+          Number(
+            await currencyController.currencyConvert(
+              req.body.currency,
+              key,
+              req.body.payment
+            )
+          );
       }
-    }
-    else{
+    } else {
       return res.status(400).json({
         status: "error",
         message: "Payment currency #",
-      })
+      });
     }
-   
   }
 
-  if(paymentObj.RWF > amountObj.RWF){
-    return res.status(400).json({status: "error", message: "Payment amount can not go beyond the price of the service"})
+  if (paymentObj.RWF > amountObj.RWF) {
+    return res.status(400).json({
+      status: "error",
+      message: "Payment amount can not go beyond the price of the service",
+    });
   }
 
   await Reservation.update(
