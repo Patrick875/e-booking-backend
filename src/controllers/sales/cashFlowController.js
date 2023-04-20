@@ -34,7 +34,7 @@ const debit = asyncWrapper(async (req, res) => {
 
   const cash_flow = await CashFlow.create({
     prevBalance: accountInfo.balance,
-    newBalance: Number(accountInfo.balance + amount),
+    newBalance: Number(accountInfo.balance) + Number(amount),
     date: new Date(),
     description ,
     amount,
@@ -97,7 +97,7 @@ const credit = asyncWrapper(async (req, res) => {
 
   const cash_flow = await CashFlow.create({
     prevBalance: accountInfo.balance,
-    newBalance: Number( accountInfo.balance - amount ),
+    newBalance: Number( accountInfo.balance) - Number(amount),
     date: new Date(),
     amount,
     account,

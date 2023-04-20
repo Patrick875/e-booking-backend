@@ -26,6 +26,7 @@ import currencyRoutes from './routes/api/currency'
 import petitStockRoutes  from './routes/api/petitStock'
 import cashFlowRouters from './routes/api/cashFolows'
 import chartRoutes from './routes/api/chat'
+import dailySalesRoutes from './routes/api/dailyCashes'
 
 
 import loginRouter from './routes/login';
@@ -50,8 +51,6 @@ app.use(express.urlencoded({ extended: true }));
 
 //middleware for cookies
 app.use(cookieParser());
-
-
 
 // crone Job
 
@@ -82,6 +81,7 @@ app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 app.use('/api/v1/petitstock', petitStockRoutes)
 app.use('/api/v1/cashflow', cashFlowRouters)
 app.use('/api/v1/chats', chartRoutes )
+app.use('/api/v1/daily-sales', dailySalesRoutes)
 
 app.use('/api/v1/currency', currencyRoutes);
 
