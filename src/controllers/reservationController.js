@@ -8,8 +8,10 @@ import {
   HallService,
   ReservationService,
   ReservationTransaction,
+  PetitStockReservation,
   Product,
   Package,
+  PetitStock
 } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 import currencyController from "./currencyController";
@@ -57,6 +59,7 @@ const AllReservations = asyncWrapper(async (req, res) => {
         attributes: { exclude: ["createdAt", "updated"] },
       },
     ],
+    order : ['createdAt', 'DESC']
   });
 
   // const totalPages = Math.ceil(dataItems.count / limit);
@@ -144,6 +147,11 @@ const CreateReservation = asyncWrapper(async (req, res) => {
             message: "Product not found or not associated with a package",
           });
       }
+
+      if(! await PetitStock.findByPk(pack.petitStockId)){
+        return res.status(404).json({status: "error", message: "Petit stock not registered"});
+      }
+
     }
   }
 
@@ -204,9 +212,11 @@ const CreateReservation = asyncWrapper(async (req, res) => {
         status: "PENDING",
         reservationId: reservation.id,
         petitStockItemId: pack.petitStockId,
+        petitStockId: pack.petitStockId,
       });
     }
   }
+
 
   saveReservationTrans(reservation.id, req.body);
 
