@@ -9,7 +9,7 @@ import {
   PetitStockSaleDetail,
   PetitStockItem
 } from "../../models";
-import CircularJSON from "circular-json";
+// import { app, BrowserWindow } from 'electron'
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateProduct = asyncWrapper(async (req, res) => {
@@ -276,6 +276,8 @@ const sell = asyncWrapper(async (req, res) => {
       },
     ],
   });
+
+
 
   return res
     .status(200)
