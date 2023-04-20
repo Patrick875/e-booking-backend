@@ -72,7 +72,8 @@ const DeleteService = asyncWrapper(async (req, res) => {
 });
 
 const GetAllServices = asyncWrapper(async (req, res) => {
-  const services = await Service.findAll({ include: [ServiceCategory] });
+  const services = await Service.findAll({ include: [ServiceCategory],  order: ['createdAt', 'DESC']
+});
   return res.status(200).json({ status: "ok", data: services });
 });
 
@@ -145,9 +146,12 @@ const allSells = asyncWrapper(async (req, res) => {
         "password",
         "verifiedAT",
       ],
-    }}
-  ]
-
+    }},
+    {
+      model: Service
+    }
+  ],
+  order: ['createdAt', 'DESC']
   });
   return res.status(200).json({ status: "success", data });
 });

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Service.belongsTo(models.ServiceCategory, {foreignKey : 'service_categoryId'});
+      this.hasMany( models.ServiceTransaction, {foreignKey : 'serviceId'});
     }
   }
 
