@@ -1,4 +1,4 @@
-import { CashBook, Account, User } from "../../models";
+import { CashFlow, Account, User } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const debit = asyncWrapper(async (req, res) => {
@@ -35,29 +35,29 @@ const debit = asyncWrapper(async (req, res) => {
 
   const { account, amount, description, doneTo } = req.body;
 
-  let accountInfo = await Account.findOne({ where: { name: account } });
+  let accountInfo = await Account.findOne({ where: { name: 'CASH' } });
 
   if (
-    !accountInfo ||
-    (accountInfo?.name.toLowerCase() != req.body.account.toLowerCase())
+    !accountInfo 
   ) {
-    accountInfo = await Account.create({ name: account, balance: 0 });
+    accountInfo = await Account.create({ name: 'CASH' , balance : 0 });
   }
 
-  const cashFlow = await CashBook.create({
+  const cash_flow = await CashFlow.create({
     prevBalance: accountInfo.balance,
     newBalance: Number(accountInfo.balance + amount),
     date: new Date(),
-    description,
+    description ,
     amount,
+    account,
     accountType: "DEBIT",
     doneBy: req.user.id,
-    doneTo ,
+    doneTo,
     status: "SUCCESS",
   });
 
-  if (cashFlow) {
-    accountInfo.set({ balance: cashFlow.newBalance });
+  if (cash_flow) {
+    accountInfo.set({ balance : cash_flow.newBalance });
   }
   await accountInfo.save();
 
@@ -79,11 +79,7 @@ const credit = asyncWrapper(async (req, res) => {
       message: "The ID of who carries the money is required",
     });
   }
-  if (!req.body.description) {
-    return res
-      .status(200)
-      .json({ status: "error", message: "The description is required" });
-  }
+ 
 
   if (!req.body.account) {
     return res
@@ -91,37 +87,30 @@ const credit = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "The account is required" });
   }
 
-  const userDoneTo = await User.findByPk(req.body.doneTo);
+  const { accountId, account, amount, description, doneTo } = req.body;
 
-  if (!userDoneTo)
-    return res.status(404).json({
-      status: "error",
-      message: `The user associated to id ${req.body.doneTo} is not found `,
-      data: cashFlow,
-    });
-
-  const { account, amount, description, doneTo } = req.body;
-
-  let accountInfo = await Account.findOne({ where: { name: account } });
-
-  if (
-    !accountInfo ||
-   ( accountInfo?.name.toLowerCase() != req.body.account.toLowerCase())
-  ) {
-
-    return res
-      .status(404)
-      .send({
+  if (account && accountId) {
+    return request
+      .status(200)
+      .json({
         status: "error",
-        message: `Invalid account ${account} can't perform credit operation`,
+        message: "Both account and accountId can't be filled at once "
       });
   }
 
-  const cashFlow = await CashBook.create({
-    prevBalance: accountInfo. balance,
-    newBalance: Number(accountInfo.balance - amount),
+  let accountInfo =  await Account.findOne( { where : { name : 'CASH' }});
+
+  if(!accountInfo) {
+    accountInfo = await Account.create({ name: 'CASH' , balance : 0 });
+  }
+
+
+  const cash_flow = await CashFlow.create({
+    prevBalance: accountInfo.balance,
+    newBalance: Number( accountInfo.balance - amount ),
     date: new Date(),
     amount,
+    account,
     description,
     accountType: "CREDIT",
     doneBy: req.user.id,
@@ -129,20 +118,20 @@ const credit = asyncWrapper(async (req, res) => {
     status: "SUCCESS",
   });
 
-  if (cashFlow) {
-    accountInfo.set({ balance : cashFlow.newBalance });
+  if (cash_flow) {
+    accountInfo.set({ balance: cash_flow.newBalance });
   }
   await accountInfo.save();
 
   return res.status(200).json({
     status: "success",
     message: `Success ${amount} Credited from ${accountInfo.name} account `,
-    data: cashFlow,
+    data: cash_flow,
   });
 });
 
-const cashFlows = asyncWrapper( async ( req, res ) => {
-  const data = await CashBook.findAll({
+const cashFlows = asyncWrapper(async (req, res) => {
+  const data = await CashFlow.findAll({
     include: [
       {
         model: User,
@@ -159,7 +148,6 @@ const cashFlows = asyncWrapper( async ( req, res ) => {
     ],
   });
 
-  return res.status(200).json( { status: 'success' , data })
-
-} )
+  return res.status(200).json({ status: "success", data });
+});
 export default { credit, debit, cashFlows };
