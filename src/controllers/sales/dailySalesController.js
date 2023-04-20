@@ -1,19 +1,21 @@
-import { DailyCash, User } from "../../models";
+import { DailyMoney, User } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const index = asyncWrapper(async (req, res) => {
-  const data = await DailyCash.findAll({
-    model: User,
-    attributes: {
-      exclude: [
-        "createdAt",
-        "updatedAt",
-        "refreshToken",
-        "password",
-        "verifiedAT",
-      ],
-    },
-  });
+  const data = await DailyMoney.findAll( { include : [
+    {
+      model: User,
+      attributes: {
+        exclude: [
+          "createdAt",
+          "updatedAt",
+          "refreshToken",
+          "password",
+          "verifiedAT",
+        ],
+      },
+    }
+  ]});
   return res.status(200).json({ staus: "ok", data });
 });
 
@@ -24,7 +26,7 @@ const update = asyncWrapper(async (req, res) => {
     return res
       .status(400)
       .json({ status: "error", message: "id not specified" });
-  const data = await DailyCash.findByPk(id);
+  const data = await DailyMoney.findByPk(id);
   if (!data)
     return res.status(404).json({ status: "error", message: "Not found" });
 
@@ -37,17 +39,39 @@ const update = asyncWrapper(async (req, res) => {
 });
 
 const create = asyncWrapper(async (req, res) => {
-  const { amount, currency, paymentMethod, carriedBy } = req.body;
 
-  if ((!amount, !currency, !paymentMethod, !carriedBy)) {
-    return res.status.json({
-      status: "error",
-      message: "amount, currency, paymentMethod, carriedBy are required",
-    });
+  const  data = req.body.data
+
+
+  for( let element of data){
+    const { amount, currency, paymentMethod, carriedBy } = element;
+    if ((!amount, !currency, !paymentMethod, !carriedBy)) {
+      return res.status.json({
+        status: "error",
+        message: "amount, currency, paymentMethod, carriedBy are required ",
+      });
+    }
   }
-  const data = await DailyCash.create({ ...req.body, receivedBy: req.user.id });
 
-  return res.status(201).json({ status: "ok", data });
+  for( let element of data){
+     await DailyMoney.create({ ...element, receivedBy: req.user.id, date : new  Date() });
+  }
+  
+  const result = await DailyMoney.findAll( { include : {
+    model: User,
+    attributes: {
+      exclude: [
+        "createdAt",
+        "updatedAt",
+        "refreshToken",
+        "password",
+        "verifiedAT",
+      ],
+    },
+  }
+})
+
+  return res.status(201).json({ status: "ok", data:result });
 });
 
 const destroy = asyncWrapper(async (req, res) => {
@@ -55,7 +79,7 @@ const destroy = asyncWrapper(async (req, res) => {
     return res.status(400).json({ staus: "error", message: " Id is required" });
   }
 
-  const result = await DailyCash.findByPk(req.params.id);
+  const result = await DailyMoney.findByPk(req.params.id);
   if (!result) {
     return res
       .status(400)
