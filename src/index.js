@@ -55,7 +55,7 @@ app.use(cookieParser());
 // crone Job
 
 app.use('/', home);
-app.use('/api/v1/login', loginRouter);
+app.use('/api/v1', loginRouter);
 app.use('/api/v1/refresh',refresh)
 
 app.use('/api/v1/roles', roleRouter);
