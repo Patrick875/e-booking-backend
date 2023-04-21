@@ -12,17 +12,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.belongsTo( models.User, { foreignKey : 'carriedBy' } )
-      this.belongsTo( models.User, { foreignKey : 'receivedBy'})
+      this.hasOne( models.DailyMoneyDetail, { foreignKey : 'dailysalesId'})
     }
   }
   DailyMoney.init({
-    amount: DataTypes.DECIMAL(10, 2),
-    paymentMethod: DataTypes.STRING,
-    currency: DataTypes.STRING,
     date: DataTypes.DATE,
-    title: DataTypes.STRING,
-    carriedBy: DataTypes.INTEGER,
-    receivedBy: DataTypes.INTEGER,
+    totals : DataTypes.JSONB,
+    receivedBy: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'DailyMoney',
