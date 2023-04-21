@@ -10,5 +10,6 @@ router.route("/add").post(usersController.createUser);
 router.route("/delete/:id").delete(usersController.deleteUser);
 router.route("/update").put(usersController.updateUser);
 router.route("/:id").get(usersController.getUser);
+router.route("/change-password").post(usersController.changePassword);
 
 module.exports = router;

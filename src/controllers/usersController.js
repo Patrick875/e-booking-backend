@@ -3,14 +3,18 @@ import bcrypt from "bcrypt";
 import { User, Role } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
+import sendEmail from "../utils/sendEmail";
+
 const getAllUsers = asyncWrapper(async (req, res) => {
-  const users = await User.findAll(
-    { include: {model: Role,
-      attributes : { exclude: [ "createdAt", "updatedAt"] }
+  const users = await User.findAll({
+    include: {
+      model: Role,
+      attributes: { exclude: ["createdAt", "updatedAt"] },
     },
-    attributes : { exclude: ["password", "createdAt", "updatedAt", "refreshToken"] }
-  },
-  );
+    attributes: {
+      exclude: ["password", "createdAt", "updatedAt", "refreshToken"],
+    },
+  });
   res.status(200).json({ message: "ok", users });
 });
 
@@ -124,10 +128,121 @@ const updateUser = asyncWrapper(async (req, res) => {
     .status(200)
     .json({ status: "ok", message: "User updated successfully", data: user });
 });
+
+const changePassword = asyncWrapper(async (req, res, next) => {
+  const { password, newPassword, confirmPassword } = req.body;
+
+  const user = await User.findOne({
+    where: { email: req.user.email },
+    include: {
+      model: Role,
+      as: "Role",
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    },
+    attributes: {
+      exclude: [
+        "createdAt",
+        "updatedAt",
+        "refreshToken",
+        "roleId",
+        "verifiedAT",
+      ],
+    },
+  });
+
+  if ((!password, !newPassword, !confirmPassword)) {
+    return res.status(400).json({
+      status: "error",
+      message: " Password, newPassword and confirmPassword are required",
+    });
+  }
+  if (password != confirmPassword) {
+    return res
+      .status(400)
+      .json({
+        status: "error",
+        message: "Password and confirm password do not match.",
+      });
+  }
+  // evaluate password
+  const match = await bcrypt.compare(password, user.password);
+  if (match) {
+    // const roles = Object.values(user.roles).filter(Boolean);
+    // create JWTs
+
+    user.set({ password: bcrypt.hash(password, 10) });
+    user.save();
+  }
+
+  // Sent Email
+
+  const emailContent = {
+    email: email,
+    subject: ` ${process.env.APP_NAME} , Password Changed`,
+    html: `<style type="text/css">
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333333;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 10px;
+  }
+  p {
+    margin: 0 0 10px;
+  }
+  table {
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  td, th {
+    padding: 5px;
+    border: 1px solid #cccccc;
+  }
+  th {
+    background-color: #eeeeee;
+    font-weight: bold;
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+<h1>Your Olympic Hotel Management System Password Has Been Changed</h1>
+<p>Dear [User],</p>
+<p>We're writing to let you know that your password for the Olympic Hotel Management System has been successfully Changed .
+ Please use the new credentials to log in to your account:</p>
+<table>
+  <tr>
+    <th>Username:</th>
+    <td>${user.email}</td>
+  </tr>
+  <tr>
+    <th>Password:</th>
+    <td> ${newPassword} </td>
+  </tr>
+</table>
+<p>Please log in to the system using your email address and your new password.</p>
+<p>If you did not request a password reset or if you have any concerns about the security of your account, please contact our support team immediately at [Support Email or Phone Number].</p>
+<p>Thank you,<br>The Olympic Hotel Management Team</p>
+</body>`,
+  };
+
+  // Send the email
+  await sendEmail(emailContent, req, res);
+
+  return res
+    .status(200)
+    .json({ status: "success", message: "Passwor reset successfull" });
+});
+
 export default {
   getAllUsers,
   getUser,
   createUser,
   deleteUser,
   updateUser,
+  changePassword,
 };
