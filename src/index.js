@@ -60,11 +60,13 @@ app.use('/api/v1/login', loginRouter);
 app.use('/api/v1/reset', resetRouter);
 app.use('/api/v1/refresh',refresh)
 
-app.use('/api/v1/roles', roleRouter);
-app.use('/api/v1/users', userRouter);
 
 // app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
 app.use(verifyJWT)
+
+
+app.use('/api/v1/roles', roleRouter);
+app.use('/api/v1/users', userRouter);
 
 app.use('/api/v1/roomclass', roomClass);
 app.use('/api/v1/room', room);

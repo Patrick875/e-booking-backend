@@ -112,7 +112,6 @@ const updateUser = asyncWrapper(async (req, res) => {
 
   if (req.body.role) {
     const role = await Role.findByPk(req.body.role);
-    console.log(role);
     if (!role) {
       return res.status(204).json({
         status: "error",
@@ -156,28 +155,25 @@ const changePassword = asyncWrapper(async (req, res, next) => {
       message: " Password, newPassword and confirmPassword are required",
     });
   }
-  if (password != confirmPassword) {
-    return res
-      .status(400)
-      .json({
-        status: "error",
-        message: "Password and confirm password do not match.",
-      });
+
+  if (newPassword != confirmPassword) {
+    return res.status(400).json({
+      status: "error",
+      message: "Password and confirm password do not match.",
+    });
   }
   // evaluate password
   const match = await bcrypt.compare(password, user.password);
   if (match) {
     // const roles = Object.values(user.roles).filter(Boolean);
-    // create JWTs
-
-    user.set({ password: bcrypt.hash(password, 10) });
+    user.set({ password: await bcrypt.hash(newPassword, 10) });
     user.save();
   }
 
   // Sent Email
 
   const emailContent = {
-    email: email,
+    email: user.email,
     subject: ` ${process.env.APP_NAME} , Password Changed`,
     html: `<style type="text/css">
   body {
@@ -211,7 +207,7 @@ const changePassword = asyncWrapper(async (req, res, next) => {
 </head>
 <body>
 <h1>Your Olympic Hotel Management System Password Has Been Changed</h1>
-<p>Dear [User],</p>
+<p>Dear ${user.firstname}</p>
 <p>We're writing to let you know that your password for the Olympic Hotel Management System has been successfully Changed .
  Please use the new credentials to log in to your account:</p>
 <table>
@@ -225,17 +221,19 @@ const changePassword = asyncWrapper(async (req, res, next) => {
   </tr>
 </table>
 <p>Please log in to the system using your email address and your new password.</p>
-<p>If you did not request a password reset or if you have any concerns about the security of your account, please contact our support team immediately at [Support Email or Phone Number].</p>
+<p>If you did not request a password reset or if you have any concerns about the security of your account, <br /> please contact our support team immediately at [Support Email or Phone Number].</p>
 <p>Thank you,<br>The Olympic Hotel Management Team</p>
 </body>`,
   };
 
   // Send the email
-  await sendEmail(emailContent, req, res);
 
-  return res
-    .status(200)
-    .json({ status: "success", message: "Passwor reset successfull" });
+  return (
+    (await sendEmail(emailContent, req, res)) &&
+    res
+      .status(200)
+      .json({ status: "success", message: "Passwor reset successfull" })
+  );
 });
 
 export default {
