@@ -76,17 +76,20 @@ const handleLogin = asyncWrapper(async (req, res) => {
   return res.status(401).json({ message: "Login failed" });
 });
 
-const resetPassword = asyncWrapper(async (req, res, next) => {
+const resetPassword = asyncWrapper(async (req, res) => {
+  console.log(req.body.email);
   if (!req.body?.email) {
     return res
       .status(400)
       .json({ status: "error", message: "Email is required" });
   }
 
-  const user = await User.findOne({ email: req.body.email });
+  const user = await User.findOne({ where: { email: req.body.email } });
 
   if (!user) {
-    return res.status(404).json({ status: "error", message: "User not found" });
+    return res
+      .status(404)
+      .json({ status: "error", message: "User with email not found" });
   }
 
   const password = generatePassword(6);
@@ -99,7 +102,7 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
   // Sent Email
 
   const emailContent = {
-    email: email,
+    email: user.email,
     subject: ` ${process.env.APP_NAME} , Password reset`,
     html: `<style type="text/css">
   body {
@@ -152,14 +155,14 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
   };
 
   // Send the email
-  await sendEmail(emailContent, req, res);
 
-  return res
-    .status(200)
-    .json({
+  return (
+    (await sendEmail(emailContent, req, res)) &&
+    res.status(200).json({
       status: "success",
       message: "User Password reset successfully check your email",
-    });
+    })
+  );
 });
 
 export default { handleLogin, resetPassword };

@@ -25,7 +25,7 @@ const options = {
           console.log(error);
       } else {
 if (res && req){
-        res.send({status: req.t('success'),Emailsent: info.response, token: reciever.token});
+        res.send({status: 'success' , Emailsent: info.response, token: reciever.token});
 }else{
         console.log('Email sent: ' + info.response);
 }

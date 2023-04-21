@@ -30,6 +30,7 @@ import dailySalesRoutes from './routes/api/dailyCashes'
 
 
 import loginRouter from './routes/login';
+import resetRouter from './routes/resetPassword'
 import logoutRouter from './routes/logout';
 import refresh from './routes/refresh';
 
@@ -55,7 +56,8 @@ app.use(cookieParser());
 // crone Job
 
 app.use('/', home);
-app.use('/api/v1', loginRouter);
+app.use('/api/v1/login', loginRouter);
+app.use('/api/v1/reset', resetRouter);
 app.use('/api/v1/refresh',refresh)
 
 app.use('/api/v1/roles', roleRouter);
