@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   DailyMoneyDetail.init({
     amount: DataTypes.FLOAT,
+    title: DataTypes.STRING,
     currency: DataTypes.STRING,
     carriedBy: DataTypes.INTEGER,
     paymentMethod: DataTypes.STRING,
