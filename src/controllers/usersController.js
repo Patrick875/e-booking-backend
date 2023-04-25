@@ -175,55 +175,26 @@ const changePassword = asyncWrapper(async (req, res, next) => {
   const emailContent = {
     email: user.email,
     subject: ` ${process.env.APP_NAME} , Password Changed`,
-    html: `<style type="text/css">
-  body {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #333333;
-  }
-  h1 {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0 0 10px;
-  }
-  p {
-    margin: 0 0 10px;
-  }
-  table {
-    border-collapse: collapse;
-    margin-bottom: 10px;
-  }
-  td, th {
-    padding: 5px;
-    border: 1px solid #cccccc;
-  }
-  th {
-    background-color: #eeeeee;
-    font-weight: bold;
-    text-align: left;
-  }
-</style>
-</head>
-<body>
-<h1>Your Olympic Hotel Management System Password Has Been Changed</h1>
-<p>Dear ${user.firstname}</p>
-<p>We're writing to let you know that your password for the Olympic Hotel Management System has been successfully Changed .
- Please use the new credentials to log in to your account:</p>
-<table>
-  <tr>
-    <th>Username:</th>
-    <td>${user.email}</td>
-  </tr>
-  <tr>
-    <th>Password:</th>
-    <td> ${newPassword} </td>
-  </tr>
-</table>
-<p>Please log in to the system using your email address and your new password.</p>
-<p>If you did not request a password reset or if you have any concerns about the security of your account, <br /> please contact our support team immediately at [Support Email or Phone Number].</p>
-<p>Thank you,<br>The Olympic Hotel Management Team</p>
-</body>`,
+    html: `
+        <body stye="font-family: Arial, sans-serif; font-size: 14px;line-height: 1.4;color: #333333; ">
+        <h1 style="font-size: 18px;font-weight: bold;margin: 0 0 10px;">Your Olympic Hotel Management System Password Has Been Changed</h1>
+        <p style="margin: 0 0 10px;">Dear ${user.firstname}</p>
+        <p style="margin: 0 0 10px;">We're writing to let you know that your password for the Olympic Hotel Management System has been successfully Changed .
+        Please use the new credentials to log in to your account:</p>
+        <table style=" border-collapse: collapse; margin-bottom: 10px;">
+          <tr>
+            <th style="background-color: #eeeeee;font-weight: bold;text-align: left;">Username:</th>
+            <td>${user.email}</td>
+          </tr>
+          <tr>
+            <th style= "background-color: #eeeeee;font-weight: bold;text-align: left;">Password:</th>
+            <td> ${newPassword} </td>
+          </tr>
+        </table>
+        <p>Please log in to the system using your email address and your new password.</p>
+        <p>If you did not request a password reset or if you have any concerns about the security of your account, <br /> please contact our support team immediately at [Support Email or Phone Number].</p>
+        <p>Thank you,<br>The Olympic Hotel Management Team</p>
+        </body>`,
   };
 
   // Send the email

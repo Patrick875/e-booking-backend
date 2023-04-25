@@ -9,7 +9,8 @@ import {
   PetitStockSaleDetail,
   PetitStockItem
 } from "../../models";
-// import { app, BrowserWindow } from 'electron'
+import { printThermal } from "../../utils/HardPrint";
+
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateProduct = asyncWrapper(async (req, res) => {
@@ -277,11 +278,13 @@ const sell = asyncWrapper(async (req, res) => {
     ],
   });
 
-
+    if(data) {
+     await printThermal(data, 'EPSON')
+    }
 
   return res
     .status(200)
-    .json({ status: "success", data, message: "Successfully Product sold" });
+    .json({ status: "success", data, message: " Successfully Product sold " });
 });
 
 const allSalles = asyncWrapper(async (req, res) => {

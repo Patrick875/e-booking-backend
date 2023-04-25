@@ -1,14 +1,12 @@
 import express from 'express'
-import petitStockRequestController from '../../controllers/stock/petitStockRequestController'
+import petitStockController from '../../controllers/stock/petitStockController'
 
 const routes = express.Router()
 
-routes.post('/order/add',petitStockRequestController.create )
-routes.get('/order/all',petitStockRequestController.index )
-routes.get('/all',petitStockRequestController.getPetitStocks )
-routes.post('/order/approve',petitStockRequestController.approve )
-routes.get('/balance',petitStockRequestController.balance )
-routes.get('/order/:id',petitStockRequestController.show )
-routes.delete('/order/delete/:id',petitStockRequestController.destroy )
+routes.get('/balance',petitStockController.balance )
+routes.get('/all',petitStockController.index )
+routes.get('/activate/:id',petitStockController.activatePetitStock )
+routes.get('/disactivate/:id',petitStockController.disActivatePetitStock )
+routes.post('/add',petitStockController.create )
 
 export default routes

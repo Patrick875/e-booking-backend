@@ -100,21 +100,6 @@ const index = asyncWrapper(async (req, res) => {
   return res.status(200).json({ status: "success", data });
 });
 
-const balance = asyncWrapper(async (req, res) => {
-  const data = await PetitStockItem.findAll({
-    include: [
-      { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
-      {
-        model: PetitStock,
-        attributes: { exclude: ["createdAt", "updatedAt"] },
-      },
-    ],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
-  });
-
-  return res.status(200).json({ status: "success", data });
-});
-
 const approve = asyncWrapper(async (req, res) => {
   const { request } = req.body;
   if (!request)
@@ -166,6 +151,7 @@ const approve = asyncWrapper(async (req, res) => {
       });
       await petitStockItem.save();
     } else {
+      
       await PetitStockItem.create({
         quantinty: Number(element.quantity),
         itemId: item.StockItem.id,
@@ -177,6 +163,7 @@ const approve = asyncWrapper(async (req, res) => {
 
 
     let stockItem =  await StockItemValue.findByPk(element.id);
+    
     
     if(stockItem){
       stockItem.set({quantity : Number(stockItem.quantity) - Number(element.quantity)})
@@ -245,8 +232,5 @@ const destroy = asyncWrapper(async (req, res) => {
     .json({ status: "success", message: "Request successfully destroyed" });
 });
 
-const getPetitStocks = asyncWrapper( async (req, res ) => {
-  const data = await PetitStock.findAll({attributes :{ exclude : ['createdAt', 'updatedAt'] }})
-  return res.status(200).json({ status: "success", message: 'all petit stocks', data})
-})
-export default { create, index, balance, approve, show, destroy , getPetitStocks};
+
+export default { create, index, approve, show, destroy };
