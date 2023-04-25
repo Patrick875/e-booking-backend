@@ -119,4 +119,29 @@ const destroy = asyncWrapper( async (req, res) => {
   return res.status(200).json({ status: "success" , message: "Voucher deleted successfully"});
 })
 
-export default { create, index, destroy };
+const trackItemTransaction  = asyncWrapper( async (req, res ) => {
+  const { stockItemId } = req.params
+  if(!stockItemId) {
+    return res.status(400).json({ status: 'error', message: 'Stock Item is required'})
+  }
+  const stockItem = await StockItem.findByPk(stockItemId);
+
+  if(!stockItem) {
+    return res.status(404).json({ status: 'error', message: 'No Stock Item found' } )
+  }
+  const itemTrack = await StockPurchaseOrder.findAll({ include : [{
+    model : StockPurchaseOrderDetail,
+    where : { stockItemId : stockItem },
+    include : [{
+      model : StockItem,
+      attributes: { exclude: ["createdAt", "updatedAt"] },
+    }],
+    attributes: { exclude : ['stockPurchaseOrderId', 'createdAt', 'updatedAt']},
+
+  }],
+  order: [['date', 'DESC']],
+})
+  
+
+})
+export default { create, index, destroy , trackItemTransaction};

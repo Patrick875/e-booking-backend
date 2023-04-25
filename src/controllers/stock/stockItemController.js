@@ -1,4 +1,14 @@
-import { StockItem, StockItemValue } from "../../models";
+import {
+  StockItem,
+  StockItemValue,
+  StockPurchaseOrder,
+  StockPurchaseOrderDetail,
+  StockReceiveVoucherDetail,
+  User,
+  PetitStock,
+  PetitStockRequesition,
+  PetitStockRequesitionDetail,
+} from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateItem = asyncWrapper(async (req, res) => {
@@ -84,6 +94,76 @@ const stockBalance = asyncWrapper(async (req, res) => {
     .status(200)
     .json({ status: "success", message: "stock balance", data });
 });
+
+const trackItemTransaction = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Stock Item is required" });
+  }
+  const stockItem = await StockItem.findByPk(id);
+
+  if (!stockItem) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "No Stock Item found" });
+  }
+  //   const itemTrack = await StockPurchaseOrder.findAll({ include : [{
+  //     model : StockPurchaseOrderDetail,
+  //     where : { id : id },
+  //     include : [{
+  //       model : StockItem,
+  //       attributes: { exclude: ["createdAt", "updatedAt"] },
+  //     }],
+  //     attributes: { exclude : ['stockPurchaseOrderId', 'createdAt', 'updatedAt']},
+
+  //   }],
+  //   order: [['date', 'DESC']],
+  // })
+
+  const itemTrack = await StockItemValue.findAll({
+    include: [
+      {
+        model: StockItem,
+        where: { id },
+      },
+      // { model: StockReceiveVoucherDetail },
+      {
+        model: PetitStockRequesitionDetail,
+        include: [
+          {
+            model: PetitStockRequesition,
+            include: {
+              model: PetitStock,
+              attributes: { exclude: ["createdAt", "updatedAt", "userId"] },
+            },
+            include: [
+              {
+                model: User,
+                attributes: {
+                  exclude: [
+                    "createdAt",
+                    "updatedAt",
+                    "refreshToken",
+                    "password",
+                    "verifiedAT",
+                  ],
+                },
+              },
+            ],
+            attributes: { exclude: ["createdAt", "updatedAt", "petitStockId"] },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "petitStockrequestId"] },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+
+  });
+
+  return res.status(200).json({ status: "success", data: itemTrack });
+});
 export default {
   CreateItem,
   GetItem,
@@ -91,4 +171,5 @@ export default {
   UpdateItem,
   DeleteItem,
   stockBalance,
+  trackItemTransaction,
 };
