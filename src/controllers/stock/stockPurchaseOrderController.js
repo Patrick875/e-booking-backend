@@ -3,9 +3,10 @@ import {
   StockItemValue,
   StockPurchaseOrderDetail,
   StockItem,
+  User
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
-
+import generateId from '../../utils/generateChonologicId'
 const create = asyncWrapper(async (req, res) => {
   if (!req.body?.order || typeof req.body.order !== "object") {
     return res.status(400).json({
@@ -23,6 +24,7 @@ const create = asyncWrapper(async (req, res) => {
     date: new Date(),
     userId: user.id,
     status: "PENDING",
+    purchaseOrderId : `PO${await generateId(StockPurchaseOrder)}`,
     total,
   });
 
@@ -68,6 +70,18 @@ const index = asyncWrapper(async (req, res) => {
           },
         ],
       },
+      {
+        model: User,
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      }
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });

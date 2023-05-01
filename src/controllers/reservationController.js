@@ -15,6 +15,7 @@ import {
 } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 import currencyController from "./currencyController";
+import generateId from '../utils/generateChonologicId'
 
 const AllReservations = asyncWrapper(async (req, res) => {
   // Set up pagination options
@@ -151,7 +152,7 @@ const CreateReservation = asyncWrapper(async (req, res) => {
           });
       }
 
-      console.log(product.Packages.ProductPackage)
+      // console.log(product.Packages.ProductPackage)
 
       if(! await PetitStock.findByPk(pack.petitStockId)){
         return res.status(404).json({status: "error", message: "Petit stock not registered"});
@@ -192,6 +193,8 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     userId: req.user.id || req.userId,
     amount: amountObj,
     payment: paymentObj,
+    bookingId : `BH${await generateId(Reservation)}`
+    
   });
 
   Object.keys(req.body).forEach(async (key, val) => {
