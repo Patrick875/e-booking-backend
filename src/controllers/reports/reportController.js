@@ -3,47 +3,36 @@ import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import { Sequelize, Op } from "sequelize";
 
 
+// function to calculate the monthly amounts for a given year
+const calculateYearlyAmounts = async (year) => {
+  const yearlyAmounts = {};
+  for (let month = 1; month <= 12; month++) {
+    const reservations = await Reservation.findAll({
+      where: {
+        [Sequelize.Op.and]: [
+          Sequelize.literal(`date_part('year', "createdAt") = ${year}`),
+          Sequelize.literal(`date_part('month', "createdAt") = ${month}`)
+        ]
+      }
+    });
+    
+    const monthlyAmount = reservations.reduce((total, reservation) => {
+      return total + parseFloat(reservation.payment.RWF);
+    }, 0);
+
+   
+    yearlyAmounts[new Date(year, month - 1).toLocaleString('default', { month: 'long' })] = monthlyAmount;
+  }
+  return yearlyAmounts;
+};
+
+
 const yearlyReservation = asyncWrapper(async (req, res) => {
   const year = req.params.year || new Date().getFullYear();
 
-  // Controller function to handle requests for yearly reservation data
+    const yearlyAmounts = await calculateYearlyAmounts(year);
 
-  // Retrieve reservation data for the year
-  const reservations = await Reservation.findAll({
-    where: {
-      checkIn: {
-        [Sequelize.Op.between]: [`${year}-01-01`, `${year}-12-31`],
-      },
-    },
-    attributes: ["id", "roomNumber", "checkIn", "checkOut", "amount"],
-    order: ["checkIn"],
-  });
-
-  // Group reservation data by month
-  const reservationDataByMonth = {};
-  for (let month = 1; month <= 12; month++) {
-    reservationDataByMonth[month] = [];
-    const reservationsInMonth = reservations.filter(
-      (reservation) => reservation.checkIn.getMonth() + 1 === month
-    );
-    for (let reservation of reservationsInMonth) {
-      reservationDataByMonth[month].push({
-        id: reservation.id,
-        roomNumber: reservation.roomNumber,
-        checkIn: reservation.checkIn,
-        checkOut: reservation.checkOut,
-        amount: reservation.amount,
-      });
-    }
-  }
-
-  // Build response object
-  const response = {
-    year: year,
-    reservationDataByMonth: reservationDataByMonth,
-  };
-
-  return res.status(200).json({ status: "success", data: response });
+  return res.status(200).json({ status: "success", data: yearlyAmounts });
 });
 
 const yearlySales = asyncWrapper(async (req, res) => {

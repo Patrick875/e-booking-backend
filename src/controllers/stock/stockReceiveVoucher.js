@@ -7,6 +7,7 @@ import {
  StockReceiveVoucherDetail
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
+import generateId from '../../utils/generateChonologicId'
 
 const create = asyncWrapper(async (req, res) => {
   if (!req.body?.data ) {
