@@ -267,7 +267,7 @@ const sell = asyncWrapper(async (req, res) => {
     userId: req.user.id,
     petiStockId: petitStockRow.id,
     amount,
-    salesId: `PS${await generateId(PetitStockSale)}`,
+    salesId: `PS_${await generateId(PetitStockSale)}`,
     date: new Date(),
   });
 

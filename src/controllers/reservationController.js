@@ -193,7 +193,7 @@ const CreateReservation = asyncWrapper(async (req, res) => {
     userId: req.user.id || req.userId,
     amount: amountObj,
     payment: paymentObj,
-    bookingId : `BH${await generateId(Reservation)}`
+    bookingId : `BH_${await generateId(Reservation)}`
     
   });
 
