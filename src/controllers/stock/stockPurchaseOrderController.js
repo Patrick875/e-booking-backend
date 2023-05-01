@@ -24,7 +24,7 @@ const create = asyncWrapper(async (req, res) => {
     date: new Date(),
     userId: user.id,
     status: "PENDING",
-    purchaseOrderId : `PO${await generateId(StockPurchaseOrder)}`,
+    purchaseOrderId : `PO_${await generateId(StockPurchaseOrder)}`,
     total,
   });
 

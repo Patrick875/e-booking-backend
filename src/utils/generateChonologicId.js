@@ -18,7 +18,7 @@ module.exports = async function generateOrderId(Model) {
     order: [['createdAt', 'DESC']]
   });
   const lastDate = lastRecord ? moment(lastRecord.createdAt).format('YYYY-MM-DD') : null;
-  const index = lastDate === now ? count : 0;
+  const index = lastDate === now ? count : 1;
   const paddedIndex = index.toString().padStart(4, '0'); // Pad the index with leading zeros
 
   const date = moment(now);
@@ -27,7 +27,7 @@ module.exports = async function generateOrderId(Model) {
   const month = date.month() + 1; // Month is zero-indexed, so add 1
   const day = date.date();
 
-  return `${paddedIndex}/${day}${month}/${year}`;
+  return `${paddedIndex}/${month}/${year}`;
 };
 
   
