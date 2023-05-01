@@ -21,10 +21,13 @@ module.exports = (sequelize, DataTypes) => {
     petiStockId: DataTypes.INTEGER,
     userId: DataTypes.INTEGER,
     amount: DataTypes.FLOAT,
+    salesId : DataTypes.STRING,
     status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'PetitStockSale',
   });
+
   return PetitStockSale;
 };
+

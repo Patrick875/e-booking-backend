@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
       },
-
+      bookingId : DataTypes.STRING,
       payment_status: DataTypes.STRING,
       adults_number: DataTypes.INTEGER,
       children_number: DataTypes.INTEGER,

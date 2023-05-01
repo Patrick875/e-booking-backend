@@ -7,6 +7,7 @@ import {
   PetitStockRequesition,
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
+import generateId from '../../utils/generateChonologicId';
 
 const create = asyncWrapper(async (req, res) => {
   const { data } = req.body;
@@ -46,6 +47,8 @@ const create = asyncWrapper(async (req, res) => {
     userId: req?.user?.id ? req.user.id : 1,
     total,
     petitStockId: petit_stock.id,
+    stockRequesitionId: `PS${await generateId(PetitStockRequesition)}`,
+
   });
 
   for (let element of data) {

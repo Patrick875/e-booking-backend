@@ -207,6 +207,31 @@ const changePassword = asyncWrapper(async (req, res, next) => {
   );
 });
 
+const disactivate = asyncWrapper (async (req, res) => {
+  if (isNaN(req.params.id)) {
+    return res
+      .status(400)
+      .json({ status: `error`, message: "Id must be a number" });
+  }
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Please provide user id" });
+  }
+
+  const user = await User.findByPk(req.params.id);
+
+  if (!user) {
+    return res
+      .status(204)
+      .json({ message: `User with id : ${req.params.id} does not exist` });
+  }
+
+  user.set({status: 'DISACTIVE'})
+  await user.save()
+
+  return res.status(200).json( { status : 'success', message : 'userd Disactivated' , data: user} );
+
+})
+
 export default {
   getAllUsers,
   getUser,
@@ -214,4 +239,5 @@ export default {
   deleteUser,
   updateUser,
   changePassword,
+  disactivate
 };

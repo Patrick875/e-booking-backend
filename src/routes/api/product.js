@@ -10,6 +10,7 @@ routes.delete('/delete/:id', productController.DeleteProduct);
 routes.get('/:id', productController.GetProductById);
 routes.post('/package/sell', productController.sell)
 routes.get('/package/sells', productController.allSalles)
+routes.get('/package/waiter/sells/:id', productController.sellsByWaiter)
 routes.post('/package/sells/approve', productController.approve)
 
 export default routes;

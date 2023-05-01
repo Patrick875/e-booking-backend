@@ -25,6 +25,7 @@ import stockReceiveVoucherRoutes  from './routes/api/stockReceiveVoucher';
 import currencyRoutes from './routes/api/currency'
 import petitStockOrderRoutes  from './routes/api/petitStockOrder'
 import petitStockRoutes from './routes/api/petitStock'
+import petitTableRoutes from './routes/api/tables'
 import cashFlowRouters from './routes/api/cashFolows'
 import chartRoutes from './routes/api/chat'
 import dailySalesRoutes from './routes/api/dailyCashes'
@@ -65,7 +66,6 @@ app.use('/api/v1/refresh',refresh)
 // app.use('/api/v1/users/add/admin', req.body.email.includes('admin'), './')
 app.use(verifyJWT)
 
-
 app.use('/api/v1/roles', roleRouter);
 app.use('/api/v1/users', userRouter);
 
@@ -85,6 +85,7 @@ app.use('/api/v1/purchase/order', purchaseOrderRoutes);
 app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 app.use('/api/v1/petitstock/order', petitStockOrderRoutes)
 app.use('/api/v1/petit-stock', petitStockRoutes )
+app.use('/api/v1/tables', petitTableRoutes )
 
 app.use('/api/v1/cashflow', cashFlowRouters)
 app.use('/api/v1/chats', chartRoutes )
