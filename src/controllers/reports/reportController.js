@@ -81,6 +81,7 @@ return res.status(200).json({status: 'success', data: results});
 const yearlySales = asyncWrapper( async(req , res) => {
 
   const year = req.params.year || new Date().getFullYear();
+  
 const results = await PetitStockSale.findAll({
   attributes: [
     [Sequelize.fn('date_trunc', 'month', Sequelize.col('createdAt')), 'month'],
