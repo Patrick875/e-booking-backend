@@ -96,6 +96,18 @@ const index = asyncWrapper(async (req, res) => {
         ],
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
+      {
+        model: User,
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
@@ -146,7 +158,7 @@ const approve = asyncWrapper(async (req, res) => {
       petitStockItem.set({
         quantinty:
           Number(
-            petitStockItem.toJSON().quantinty != null
+            !petitStockItem.toJSON().quantinty
               ? petitStockItem.toJSON().quantinty
               : 0
           ) + Number(element.quantity),
