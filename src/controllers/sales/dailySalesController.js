@@ -7,6 +7,21 @@ const index = asyncWrapper(async (req, res) => {
     include: [
       {
         model: User,
+        as : 'receiver',
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      },
+
+      {
+        model: User,
+        as : 'carrier',
         attributes: {
           exclude: [
             "createdAt",
@@ -106,6 +121,7 @@ const create = asyncWrapper(async (req, res) => {
     include: [
       {
         model: User,
+        as: 'receiver',
         attributes: {
           exclude: [
             "createdAt",
@@ -116,12 +132,25 @@ const create = asyncWrapper(async (req, res) => {
           ],
         },
       },
-
+      {
+        model: User,
+        as: 'carrier',
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      },
       {
         model: DailyMoneyDetail,
         include: [
           {
             model: User,
+            as : 'carrier',
             attributes : {
               exclude: [
                 "createdAt",

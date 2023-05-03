@@ -152,8 +152,6 @@ const CreateReservation = asyncWrapper(async (req, res) => {
           });
       }
 
-      // console.log(product.Packages.ProductPackage)
-
       if(! await PetitStock.findByPk(pack.petitStockId)){
         return res.status(404).json({status: "error", message: "Petit stock not registered"});
       }
