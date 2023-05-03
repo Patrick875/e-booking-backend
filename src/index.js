@@ -30,6 +30,8 @@ import cashFlowRouters from './routes/api/cashFolows'
 import chartRoutes from './routes/api/chat'
 import dailySalesRoutes from './routes/api/dailyCashes'
 import reportsRoutes from './routes/api/reports'
+import bonDoCommandRoutes from './routes/api/bonDeCommand'
+import deliveryNoteRoutes from './routes/api/deliveryNote'
 
 
 import loginRouter from './routes/login';
@@ -95,6 +97,9 @@ app.use('/api/v1/tables', petitTableRoutes )
 app.use('/api/v1/cashflow', cashFlowRouters)
 app.use('/api/v1/chats', chartRoutes )
 app.use('/api/v1/daily-sales', dailySalesRoutes)
+
+app.use('/api/v1/bonDeCommand', bonDoCommandRoutes)
+app.use('/api/v1/deliveryNote', deliveryNoteRoutes)
 
 app.use('/api/v1/currency', currencyRoutes);
 

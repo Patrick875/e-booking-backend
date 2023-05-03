@@ -11,14 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo( models.User, { foreignKey : 'carriedBy' } )
+      // this.belongsTo( models.User, {as: 'carrier', foreignKey : 'carriedBy' } )
+      this.belongsTo( models.User, { as: 'receiver', foreignKey : 'receivedBy' } )
       this.hasMany( models.DailyMoneyDetail, { foreignKey : 'dailysalesId'})
     }
   }
   DailyMoney.init({
     date: DataTypes.DATE,
     totals : DataTypes.JSONB,
-    receivedBy: DataTypes.INTEGER
+    receivedBy: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'DailyMoney',
