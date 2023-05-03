@@ -15,7 +15,7 @@ const create = asyncWrapper(async (req, res) => {
 
   for (let dataElement of data.details) {
     if (
-      !dataElement.quantinty ||
+      !dataElement.quantity ||
       !dataElement.times ||
       !dataElement.unitPrice ||
       !dataElement.description
@@ -26,7 +26,13 @@ const create = asyncWrapper(async (req, res) => {
       });
     }
 
-    total = total + Number(item.price * dataElement.quantity * (dataElement?.times ? dataElement?.times : 1 ) );
+    total =
+      total +
+      Number(
+           dataElement.unitPrice *
+          dataElement.quantity *
+          (dataElement?.times ? dataElement?.times : 1)
+      );
   }
 
   const bondocommand = await BonCommande.create({
@@ -36,14 +42,14 @@ const create = asyncWrapper(async (req, res) => {
     date_to: data.date_to,
     total,
     status: "PENDING",
-    BonCommandeId: `DN_${await generateId(BonCommande)}`,
+    BonCommandeId: `BC_${await generateId(BonCommande)}`,
   });
 
   for (let element of data.details) {
     await BonCommandeDetail.create({
       description: element.description,
       times: element.times,
-      unitPrice: unitPrice.quantinty,
+      unitPrice: element.quantity,
       commandId: bondocommand.id,
     });
   }
@@ -139,7 +145,14 @@ const destroy = asyncWrapper(async (req, res) => {
       .json({ status: "success", message: " BonCommande not found" });
   }
 
-  await request.destroy();
+  await request.destroy({
+    include: [
+      {
+        model: BonCommandeDetail,
+        as: "BonCommandeDetails",
+      },
+    ],
+  });
   return res
     .status(200)
     .json({ status: "success", message: "BonCommande successfully destroyed" });
