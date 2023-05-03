@@ -5,22 +5,23 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
   const create = asyncWrapper(async (req, res) => {
     const { data } = req.body;
   
-    if (!data[0].petitStock) {
+    if (!data.details) {
       return res
         .status(400)
-        .json({ status: "error", message: "petit stock is requried " });
+        .json({ status: "error", message: "The details is requried " });
     }
+
     let total = 0;
   
 
     for (let dataElement of data.details) {
-      if (!dataElement.quantinty || !dataElement.times ) {
+      if (!dataElement.quantity || !dataElement.times ) {
         return res.status(404).json({
           status: "error",
           message: `Quantity and times are required`,
         });
       }
-      total = total + Number(item.price * dataElement.quantity);
+      total = total + Number(dataElement.unitPrice * dataElement.quantity);
     }
   
     const deliveryNote = await DeliveryNote.create({
@@ -39,7 +40,7 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
       await DeliveryNoteDetail.create({
         description: element.description,
         times: element.times,
-        unitPrice : unitPrice.quantinty,
+        unitPrice : element.quantinty,
         deliveryId: deliveryNote.id,
       });
     }
