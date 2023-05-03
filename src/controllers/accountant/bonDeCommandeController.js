@@ -1,10 +1,10 @@
-import { BonCommande, BonCommandeDetail } from "../../models";
+import { BonDeCommande, BonDeCommandeDetail } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
 
 const create = asyncWrapper(async (req, res) => {
-  const { data } = req.body;
+  const  data  = req.body;
 
   if (!data.details) {
     return res
@@ -17,46 +17,50 @@ const create = asyncWrapper(async (req, res) => {
     if (
       !dataElement.quantity ||
       !dataElement.times ||
-      !dataElement.unitPrice ||
+      !dataElement.price ||
       !dataElement.description
     ) {
       return res.status(404).json({
         status: "error",
-        message: `Quantity, times, unitPrice and description are both required`,
+        message: `Quantity, times, price and description are both required`,
       });
     }
 
     total =
       total +
       Number(
-           dataElement.unitPrice *
+           dataElement.price *
           dataElement.quantity *
           (dataElement?.times ? dataElement?.times : 1)
       );
   }
 
-  const bondocommand = await BonCommande.create({
+  const bondocommand = await BonDeCommande.create({
     userId: req?.user?.id,
     company: data.company,
     date_from: data.date_from,
     date_to: data.date_to,
+    function: data.function,
+    fax: data.fax,
     total,
     status: "PENDING",
-    BonCommandeId: `BC_${await generateId(BonCommande)}`,
+    BonCommandeId: `BC_${await generateId(BonDeCommande)}`,
   });
 
   for (let element of data.details) {
-    await BonCommandeDetail.create({
+    await BonDeCommandeDetail.create({
       description: element.description,
       times: element.times,
-      unitPrice: element.quantity,
+      quantity: element.quantity,
+      unitPrice: element.price,
+      VAT: element.VAT,
       commandId: bondocommand.id,
     });
   }
 
-  const delivery = await BonCommande.findByPk(BonCommande.id, {
+  const delivery = await BonDeCommande.findByPk(bondocommand.id, {
     include: {
-      model: BonCommandeDetail,
+      model: BonDeCommandeDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
     attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -70,9 +74,9 @@ const create = asyncWrapper(async (req, res) => {
 });
 
 const index = asyncWrapper(async (req, res) => {
-  const data = await BonCommande.findAll({
+  const data = await BonDeCommande.findAll({
     include: {
-      model: BonCommandeDetail,
+      model: BonDeCommandeDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
     attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -89,10 +93,10 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The ID is required",
     });
 
-  let delivery = await BonCommande.findByPk(id, {
+  let delivery = await BonDeCommande.findByPk(id, {
     include: [
       {
-        model: BonCommandeDetail,
+        model: BonDeCommandeDetail,
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
@@ -105,7 +109,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "Delivery note related to this Id not found",
     });
 
-  await BonCommande.update({ status: "APPROVED" }, { where: { id } });
+  await BonDeCommande.update({ status: "APPROVED" }, { where: { id } });
 
   return res
     .status(200)
@@ -119,10 +123,10 @@ const show = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Id is required" });
   }
 
-  const data = await BonCommande.findByPk(req.params.id, {
+  const data = await BonDeCommande.findByPk(req.params.id, {
     include: [
       {
-        model: BonCommandeDetail,
+        model: BonDeCommandeDetail,
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
@@ -137,25 +141,25 @@ const destroy = asyncWrapper(async (req, res) => {
     return res.status(400).json({ status: "error", message: "Id is required" });
   }
 
-  const request = await BonCommande.findByPk(req.params.id);
+  const request = await BonDeCommande.findByPk(req.params.id);
 
   if (!request) {
     return res
       .status(200)
-      .json({ status: "success", message: " BonCommande not found" });
+      .json({ status: "success", message: " BonDeCommande not found" });
   }
 
   await request.destroy({
     include: [
       {
-        model: BonCommandeDetail,
-        as: "BonCommandeDetails",
+        model: BonDeCommandeDetail,
+        as: "BonDeCommandeDetails",
       },
     ],
   });
   return res
     .status(200)
-    .json({ status: "success", message: "BonCommande successfully destroyed" });
+    .json({ status: "success", message: "BonDeCommande successfully destroyed" });
 });
 
 export default { create, index, approve, show, destroy };
