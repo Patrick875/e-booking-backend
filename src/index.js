@@ -32,6 +32,7 @@ import dailySalesRoutes from './routes/api/dailyCashes'
 import reportsRoutes from './routes/api/reports'
 import bonDoCommandRoutes from './routes/api/bonDeCommand'
 import deliveryNoteRoutes from './routes/api/deliveryNote'
+import constantsRouters from './routes/api/constants';
 
 
 import loginRouter from './routes/login';
@@ -93,6 +94,9 @@ app.use('/api/v1/receive/voucher', stockReceiveVoucherRoutes);
 app.use('/api/v1/petitstock/order', petitStockOrderRoutes)
 app.use('/api/v1/petit-stock', petitStockRoutes )
 app.use('/api/v1/tables', petitTableRoutes )
+
+app.use('/api/v1/constants', constantsRouters )
+
 
 app.use('/api/v1/cashflow', cashFlowRouters)
 app.use('/api/v1/chats', chartRoutes )
