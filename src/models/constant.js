@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Constant extends Model {
+  class ConstantNew extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -13,13 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Constant.init({
+  ConstantNew.init({
     name: DataTypes.STRING,
-    value: DataTypes.INTEGER,
+    value: DataTypes.FLOAT,
+    value2: DataTypes.STRING,
     status: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Constant',
+    modelName: 'ConstantNew',
   });
-  return Constant;
+  return ConstantNew;
 };

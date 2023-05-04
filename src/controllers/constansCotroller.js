@@ -1,4 +1,4 @@
-import { Constant } from "../models";
+import { ConstantNew } from "../models";
 import { asyncWrapper } from "../utils/handlingTryCatchBlocks";
 
 const create = asyncWrapper(async (req, res) => {
@@ -13,8 +13,7 @@ const create = asyncWrapper(async (req, res) => {
 
 
 
-  const result = await Constant.create(
-    ...req.body  );
+  const result = await ConstantNew.create(req.body);
   return res.status(201).json({
     status: "ok",
     message: "Constant created successfully",
@@ -28,12 +27,12 @@ const update = asyncWrapper(async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Constant id is required to update" });
 
-  const constants = await Constant.findByPk(req.body.id);
+  const constants = await ConstantNew.findByPk(req.body.id);
 
   if (!constants)
     return res.status(404).json({
       status: "error",
-      message: "Package with id '" + req.body.id + "' not found",
+      message: "Constant with id '" + req.body.id + "' not found",
     });
 
   constants.set({
@@ -53,7 +52,7 @@ const destroy = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "Constant id is required to delete" });
   }
 
-  const constants = await Constant.findByPk(req.params.id);
+  const constants = await ConstantNew.findByPk(req.params.id);
   if (!constants) {
     return res.status(404).json({
       status: "error",
@@ -75,12 +74,12 @@ const show = asyncWrapper(async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Constant id is required" });
   }
-  const constants = await Constant.findByPk(req.params.id);
+  const constants = await ConstantNew.findByPk(req.params.id);
   return res.status(200).json({ status: "ok", data: constants });
 });
 
 const index = asyncWrapper(async (req, res) => {
-  const constants = await Constant.findAll({
+  const constants = await ConstantNew.findAll({
     order: [["id", "DESC"]],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
