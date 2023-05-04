@@ -1,4 +1,4 @@
-import { Room, RoomClass, Reservation } from "../../models";
+import { Room, RoomClass, Reservation, Customer } from "../../models";
 import { asyncWrapper } from '../../utils/handlingTryCatchBlocks'
 
 const getAllRoom = asyncWrapper(async (req, res) => {
@@ -7,6 +7,11 @@ const getAllRoom = asyncWrapper(async (req, res) => {
       { model: RoomClass, attributes: { exclude: ["createdAt", "updatedAt"] } },
       {
         model: Reservation,
+        include : [{
+          model: Customer,
+          attributes: { exclude: ["createdAt", "updatedAt"] },
+
+        }],
         attributes: { exclude: ["createdAt", "updatedAt"] },
         order: [['dueDate', 'ASC']],
         onAfterFind: (tasks,options) => {

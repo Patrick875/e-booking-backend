@@ -9,7 +9,7 @@ const create = asyncWrapper(async (req, res) => {
   if (!data.details) {
     return res
       .status(400)
-      .json({ status: "error", message: "petit stock is requried " });
+      .json({ status: "error", message: "Details is requried " });
   }
   let total = 0;
 
