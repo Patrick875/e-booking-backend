@@ -27,8 +27,7 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
     const deliveryNote = await DeliveryNote.create({
       userId: req?.user?.id,
       company : data.company,
-      date_from : data.date_from,
-      date_to : data.date_to,
+      guest_name: data.guest_name,
       total,
       status: 'PENDING',
       deliveryNoteId: `DN_${await generateId(DeliveryNote)}`,
@@ -40,7 +39,8 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
       await DeliveryNoteDetail.create({
         description: element.description,
         times: element.times,
-        unitPrice : element.quantinty,
+        unitPrice : element.unitPrice,
+        quantity : element.quantity,
         deliveryId: deliveryNote.id,
       });
     }
