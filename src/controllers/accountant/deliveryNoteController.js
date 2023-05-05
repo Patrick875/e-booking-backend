@@ -3,7 +3,7 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
   import generateId from '../../utils/generateChonologicId';
   
   const create = asyncWrapper(async (req, res) => {
-    const { data } = req.body;
+    const  data  = req.body;
   
     if (!data.details) {
       return res
