@@ -19,7 +19,6 @@ module.exports = (sequelize, DataTypes) => {
     company: DataTypes.STRING,
     guest_name: DataTypes.STRING,
     total : DataTypes.FLOAT,
-    date: DataTypes.DATE,
     deliveryNoteId: DataTypes.STRING,
     status: DataTypes.STRING
   }, {
