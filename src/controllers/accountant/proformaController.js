@@ -1,4 +1,4 @@
-import { Proforma, ProformaDetail } from "../../models";
+import { ProformaInvoice, ProformaDetail } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
@@ -35,14 +35,15 @@ const create = asyncWrapper(async (req, res) => {
       );
   }
 
-  const invoice = await Proforma.create({
+  const invoice = await ProformaInvoice.create({
     userId: req?.user?.id,
     clientName: data.clientName,
     clientType: data.clientType,
     function: data.function,
     total,
     status: "PENDING",
-    invoiceGnerated: `IV_${await generateId(Proforma)}`,
+    proformaGenerated: `PI_${await generateId(ProformaInvoice)}`
+
   });
 
   for (let element of data.details) {
@@ -50,13 +51,13 @@ const create = asyncWrapper(async (req, res) => {
       name: element.name,
       times: element.times,
       quantity: element.quantity,
-      unitPrice: element.price,
+      price: element.price,
       VAT: element.VAT,
       invoiceId: invoice.id,
     });
   }
 
-  const delivery = await Proforma.findByPk(invoice.id, {
+  const delivery = await ProformaInvoice.findByPk(invoice.id, {
     include: {
       model: ProformaDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -72,7 +73,7 @@ const create = asyncWrapper(async (req, res) => {
 });
 
 const index = asyncWrapper(async (req, res) => {
-  const data = await Proforma.findAll({
+  const data = await ProformaInvoice.findAll({
     include: {
       model: ProformaDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -91,7 +92,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The ID is required",
     });
 
-  let invoice = await Proforma.findByPk(id, {
+  let invoice = await ProformaInvoice.findByPk(id, {
     include: [
       {
         model: ProformaDetail,
@@ -107,11 +108,11 @@ const approve = asyncWrapper(async (req, res) => {
       message: "Delivery note related to this Id not found",
     });
 
-  await Proforma.update({ status: "APPROVED" }, { where: { id } });
+  await ProformaInvoice.update({ status: "APPROVED" }, { where: { id } });
 
   return res
     .status(200)
-    .json({ status: "OK", message: "Proforma approved", data: invoice });
+    .json({ status: "OK", message: "ProformaInvoice approved", data: invoice });
 });
 
 const show = asyncWrapper(async (req, res) => {
@@ -121,7 +122,7 @@ const show = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Id is required" });
   }
 
-  const data = await Proforma.findByPk(req.params.id, {
+  const data = await ProformaInvoice.findByPk(req.params.id, {
     include: [
       {
         model: ProformaDetail,
@@ -139,7 +140,7 @@ const destroy = asyncWrapper(async (req, res) => {
     return res.status(400).json({ status: "error", message: "Id is required" });
   }
 
-  const proforma = await Proforma.findByPk(req.params.id);
+  const proforma = await ProformaInvoice.findByPk(req.params.id);
 
   if (!proforma) {
     return res

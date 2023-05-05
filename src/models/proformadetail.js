@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Proforma, { foreignKey : 'invoiceId' })
+      this.belongsTo(models.ProformaInvoice, { foreignKey : 'proformaId' })
 
     }
   }

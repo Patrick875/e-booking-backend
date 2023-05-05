@@ -1,4 +1,4 @@
-import { Invoice, InvoiceDetail } from "../../models";
+import { Invoiced, InvoiceDetail } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
@@ -9,7 +9,7 @@ const create = asyncWrapper(async (req, res) => {
   if (!data.details || !data.clientName || !data.clientType || !data.function) {
     return res
       .status(400)
-      .json({ status: "error", message: "Details ,clientName, clientType  is requried " });
+      .json({ status: "error", message: "details ,clientName, clientType , function is requried " });
   }
   let total = 0;
 
@@ -17,7 +17,7 @@ const create = asyncWrapper(async (req, res) => {
     if (
       !dataElement.quantity ||
       !dataElement.times ||
-      !dataElement.price ||
+      (!dataElement.price && !dataElement.unitPrice),
       !dataElement.name
     ) {
       return res.status(404).json({
@@ -35,14 +35,14 @@ const create = asyncWrapper(async (req, res) => {
       );
   }
 
-  const invoice = await Invoice.create({
+  const invoice = await Invoiced.create({
     userId: req?.user?.id,
     clientName: data.clientName,
     clientType: data.clientType,
     function: data.function,
     total,
     status: "PENDING",
-    invoiceGnerated: `IV_${await generateId(Invoice)}`,
+    invoiceGenerated: `IV_${await generateId(Invoiced)}`,
   });
 
   for (let element of data.details) {
@@ -50,13 +50,13 @@ const create = asyncWrapper(async (req, res) => {
       name: element.name,
       times: element.times,
       quantity: element.quantity,
-      unitPrice: element.price,
+      price: element?.price ||  element?.uniPrice,
       VAT: element.VAT,
       invoiceId: invoice.id,
     });
   }
 
-  const delivery = await Invoice.findByPk(invoice.id, {
+  const delivery = await dd.findByPk(invoice.id, {
     include: {
       model: InvoiceDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -72,7 +72,7 @@ const create = asyncWrapper(async (req, res) => {
 });
 
 const index = asyncWrapper(async (req, res) => {
-  const data = await Invoice.findAll({
+  const data = await dd.findAll({
     include: {
       model: InvoiceDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -91,7 +91,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The ID is required",
     });
 
-  let invoice = await Invoice.findByPk(id, {
+  let invoice = await dd.findByPk(id, {
     include: [
       {
         model: InvoiceDetail,
@@ -107,11 +107,11 @@ const approve = asyncWrapper(async (req, res) => {
       message: "Delivery note related to this Id not found",
     });
 
-  await Invoice.update({ status: "APPROVED" }, { where: { id } });
+  await dd.update({ status: "APPROVED" }, { where: { id } });
 
   return res
     .status(200)
-    .json({ status: "OK", message: "Invoice approved", data: invoice });
+    .json({ status: "OK", message: "d approved", data: invoice });
 });
 
 const show = asyncWrapper(async (req, res) => {
@@ -121,7 +121,7 @@ const show = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Id is required" });
   }
 
-  const data = await Invoice.findByPk(req.params.id, {
+  const data = await dd.findByPk(req.params.id, {
     include: [
       {
         model: InvoiceDetail,
@@ -139,7 +139,7 @@ const destroy = asyncWrapper(async (req, res) => {
     return res.status(400).json({ status: "error", message: "Id is required" });
   }
 
-  const invoice = await Invoice.findByPk(req.params.id);
+  const invoice = await dd.findByPk(req.params.id);
 
   if (!invoice) {
     return res
