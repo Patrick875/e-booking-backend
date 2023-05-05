@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Proforma extends Model {
+  class ProformaInvoice extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -15,17 +15,18 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo( models.User, { foreignKey : 'proformaId' } );
     }
   }
-  Proforma.init({
+  ProformaInvoice.init({
     clientName: DataTypes.STRING,
     clientType: DataTypes.STRING,
     function: DataTypes.STRING,
     status: DataTypes.STRING,
     total: DataTypes.FLOAT,
+    proformaGenerated: DataTypes.STRING,
     userId : DataTypes.INTEGER
 
   }, {
     sequelize,
-    modelName: 'Proforma',
+    modelName: 'ProformaInvoice',
   });
-  return Proforma;
+  return ProformaInvoice;
 };
