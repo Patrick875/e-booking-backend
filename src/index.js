@@ -32,6 +32,8 @@ import dailySalesRoutes from './routes/api/dailyCashes'
 import reportsRoutes from './routes/api/reports'
 import bonDoCommandRoutes from './routes/api/bonDeCommand'
 import deliveryNoteRoutes from './routes/api/deliveryNote'
+import porformaRoutes from './routes/api/prforma'
+import invoiceRoutes from './routes/api/invoice'
 import constantsRouters from './routes/api/constants';
 
 
@@ -104,6 +106,8 @@ app.use('/api/v1/daily-sales', dailySalesRoutes)
 
 app.use('/api/v1/bonDeCommand', bonDoCommandRoutes)
 app.use('/api/v1/deliveryNote', deliveryNoteRoutes)
+app.use('/api/v1/proforma', porformaRoutes)
+app.use('/api/v1/invoices', invoiceRoutes)
 
 app.use('/api/v1/currency', currencyRoutes);
 
