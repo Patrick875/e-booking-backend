@@ -1,4 +1,4 @@
-import { Invoiced, InvoiceDetail } from "../../models";
+import { Invoiced, InvoiceDetail, User } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
@@ -20,7 +20,7 @@ const create = asyncWrapper(async (req, res) => {
       (!dataElement.price && !dataElement.unitPrice),
       !dataElement.name
     ) {
-      return res.status(404).json({
+      return res.status(400).json({
         status: "error",
         message: `Quantity, times, price and name are both required under details`,
       });
@@ -56,7 +56,7 @@ const create = asyncWrapper(async (req, res) => {
     });
   }
 
-  const delivery = await dd.findByPk(invoice.id, {
+  const delivery = await Invoiced.findByPk(invoice.id, {
     include: {
       model: InvoiceDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -72,11 +72,23 @@ const create = asyncWrapper(async (req, res) => {
 });
 
 const index = asyncWrapper(async (req, res) => {
-  const data = await dd.findAll({
-    include: {
+  const data = await Invoiced.findAll({
+    include: [{
       model: InvoiceDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
+    {
+      model: User,
+      attributes: {
+        exclude: [
+          "createdAt",
+          "updatedAt",
+          "refreshToken",
+          "password",
+          "verifiedAT",
+        ],
+      },
+    },],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
@@ -91,7 +103,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The ID is required",
     });
 
-  let invoice = await dd.findByPk(id, {
+  let invoice = await Invoiced.findByPk(id, {
     include: [
       {
         model: InvoiceDetail,
@@ -107,7 +119,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "Delivery note related to this Id not found",
     });
 
-  await dd.update({ status: "APPROVED" }, { where: { id } });
+  await Invoiced.update({ status: "APPROVED" }, { where: { id } });
 
   return res
     .status(200)
@@ -121,7 +133,7 @@ const show = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: " Id is required" });
   }
 
-  const data = await dd.findByPk(req.params.id, {
+  const data = await Invoiced.findByPk(req.params.id, {
     include: [
       {
         model: InvoiceDetail,
@@ -139,7 +151,7 @@ const destroy = asyncWrapper(async (req, res) => {
     return res.status(400).json({ status: "error", message: "Id is required" });
   }
 
-  const invoice = await dd.findByPk(req.params.id);
+  const invoice = await Invoiced.findByPk(req.params.id);
 
   if (!invoice) {
     return res

@@ -1,4 +1,4 @@
-import { BonDeCommande, BonDeCommandeDetail } from "../../models";
+import { BonDeCommande, BonDeCommandeDetail, User } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
@@ -52,7 +52,7 @@ const create = asyncWrapper(async (req, res) => {
       description: element.description,
       times: element.times,
       quantity: element.quantity,
-      unitPrice: element.price,
+      unitPrice: Number(element.price),
       VAT: element.VAT,
       commandId: bondocommand.id,
     });
@@ -73,12 +73,24 @@ const create = asyncWrapper(async (req, res) => {
   });
 });
 
-const index = asyncWrapper(async (req, res) => {
+const index = asyncWrapper(async (req, res) => { 
   const data = await BonDeCommande.findAll({
-    include: {
+    include: [{
       model: BonDeCommandeDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
+    {
+      model: User,
+      attributes: {
+        exclude: [
+          "createdAt",
+          "updatedAt",
+          "refreshToken",
+          "password",
+          "verifiedAT",
+        ],
+      },
+    },],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 

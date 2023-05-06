@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasOne(models.StockReceiveVoucherDetail, { foreignKey: 'stockItemId' });
       this.hasMany(models.StockItemValue, { foreignKey: 'stockItemId' } );
       this.hasMany(models.PetitStockItem, { foreignKey: 'itemId'} )
+      this.hasMany(models.StockItemTransaction, { foreignKey: 'stockItem' } );
       
     }
   }

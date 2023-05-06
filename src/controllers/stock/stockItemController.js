@@ -8,7 +8,9 @@ import {
   PetitStock,
   PetitStockRequesition,
   PetitStockRequesitionDetail,
+  StockItemTransaction,
 } from "../../models";
+import { Op } from "sequelize";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateItem = asyncWrapper(async (req, res) => {
@@ -95,75 +97,61 @@ const stockBalance = asyncWrapper(async (req, res) => {
     .json({ status: "success", message: "stock balance", data });
 });
 
-const trackItemTransaction = asyncWrapper(async (req, res) => {
-  const { id } = req.params;
-  if (!id) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "Stock Item is required" });
+const trackItemTransaction = asyncWrapper( async (req, res) => {
+
+  const { item, date_from, date_to } = req.query;
+  if(item) {
+    const row = await StockItem.findByPk(item);
+    if(!row) return res.status(404).json({ status: 'error', message: 'stock item not found' });
   }
-  const stockItem = await StockItem.findByPk(id);
 
-  if (!stockItem) {
-    return res
-      .status(404)
-      .json({ status: "error", message: "No Stock Item found" });
+  let itemTransaction
+
+  if ((item && date_from && date_to)) {
+
+     itemTransaction = await StockItemTransaction.findAll({
+      include : [ {model : StockItem, 
+      attributes: { exclude : ['updatedAt'] } } ],
+      where: {
+        stockItem: item,
+        createdAt: {
+          [Op.between]: [date_from, date_to],
+        },
+      },
+    });
   }
-  //   const itemTrack = await StockPurchaseOrder.findAll({ include : [{
-  //     model : StockPurchaseOrderDetail,
-  //     where : { id : id },
-  //     include : [{
-  //       model : StockItem,
-  //       attributes: { exclude: ["createdAt", "updatedAt"] },
-  //     }],
-  //     attributes: { exclude : ['stockPurchaseOrderId', 'createdAt', 'updatedAt']},
-
-  //   }],
-  //   order: [['date', 'DESC']],
-  // })
-
-  const itemTrack = await StockItemValue.findAll({
-    include: [
-      {
-        model: StockItem,
-        where: { id },
+  else if(date_from && date_to){
+    itemTransaction = await StockItemTransaction.findAll({
+      include : [ {model : StockItem, 
+      attributes: { exclude : ['updatedAt'] } } ],
+      where: {
+        createdAt: {
+          [Op.between]: [date_from, date_to],
+        },
       },
-      // { model: StockReceiveVoucherDetail },
-      {
-        model: PetitStockRequesitionDetail,
-        include: [
-          {
-            model: PetitStockRequesition,
-            include: {
-              model: PetitStock,
-              attributes: { exclude: ["createdAt", "updatedAt", "userId"] },
-            },
-            include: [
-              {
-                model: User,
-                attributes: {
-                  exclude: [
-                    "createdAt",
-                    "updatedAt",
-                    "refreshToken",
-                    "password",
-                    "verifiedAT",
-                  ],
-                },
-              },
-            ],
-            attributes: { exclude: ["createdAt", "updatedAt", "petitStockId"] },
-          },
-        ],
-        attributes: { exclude: ["createdAt", "petitStockrequestId"] },
+    });
+   }
+   else if (item){
+    itemTransaction = await StockItemTransaction.findAll({
+      include : [ {model : StockItem, 
+      attributes: { exclude : ['updatedAt'] } } ],
+      where: {
+        stockItem : item
       },
-    ],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
+    });
+   }
+   else{
+    itemTransaction = await StockItemTransaction.findAll({
+      include : [ {model : StockItem, 
+      attributes: { exclude : ['updatedAt'] } } ],
+    });
+   }
 
-  });
 
-  return res.status(200).json({ status: "success", data: itemTrack });
+  return res.status(200).json({ status: "success", data: itemTransaction });
 });
+
+
 export default {
   CreateItem,
   GetItem,

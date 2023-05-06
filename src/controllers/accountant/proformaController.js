@@ -1,4 +1,4 @@
-import { ProformaInvoice, ProformaDetail } from "../../models";
+import { ProformaInvoice, ProformaDetail, User } from "../../models";
 
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 import generateId from "../../utils/generateChonologicId";
@@ -74,10 +74,23 @@ const create = asyncWrapper(async (req, res) => {
 
 const index = asyncWrapper(async (req, res) => {
   const data = await ProformaInvoice.findAll({
-    include: {
+    include: [{
       model: ProformaDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
+    {
+      model: User,
+      attributes: {
+        exclude: [
+          "createdAt",
+          "updatedAt",
+          "refreshToken",
+          "password",
+          "verifiedAT",
+        ],
+      },
+    },
+  ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
