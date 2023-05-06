@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       this.hasMany(models.ProformaDetail,  { foreignKey: 'invoiceId' })
-      this.belongsTo( models.User, { foreignKey : 'proformaId' } );
+      this.belongsTo( models.User, { foreignKey : 'userId' } );
     }
   }
   ProformaInvoice.init({

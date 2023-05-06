@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     quantity: DataTypes.INTEGER,
     times: DataTypes.INTEGER,
     unitPrice: DataTypes.FLOAT,
-    VAT: DataTypes.FLOAT,
+    VAT: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'BonDeCommandeDetail',
