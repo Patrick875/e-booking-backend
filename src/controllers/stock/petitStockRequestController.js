@@ -109,6 +109,10 @@ const index = asyncWrapper(async (req, res) => {
           ],
         },
       },
+      {
+        model: PetitStock,
+        attributes: { exclude: ["updatedAt"]}
+      }
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });

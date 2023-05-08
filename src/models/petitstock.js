@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     this.hasOne(models.PetitStockSale, { foreignKey: 'petiStockId'})
     this.hasMany(models.PetitStockItem , { foreignKey: 'petitstockId' })
+    this.hasOne(models.PetitStockRequesition, { foreignKey: 'petitStockId' })
     }
   }
   PetitStock.init({
