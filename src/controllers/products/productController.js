@@ -156,10 +156,15 @@ const UpdateProductPackage = asyncWrapper(async (req, res) => {
   if (!product)
     return res
       .status(404)
-      .json({ status: "error", message: "We dont have that sccociation product and package" });
+      .json({
+        status: "error",
+        message: "We dont have that sccociation product and package",
+      });
 
-      const productPackage = await product.getPackages({ where: { id: req.body.package_id } });
-      await productPackage[0].ProductPackage.update({ price: req.body.price });
+  const productPackage = await product.getPackages({
+    where: { id: req.body.package_id },
+  });
+  await productPackage[0].ProductPackage.update({ price: req.body.price });
 
   const data = await Product.findByPk(product.id, {
     include: [
@@ -236,12 +241,11 @@ const GetAllProducts = asyncWrapper(async (req, res) => {
     include: [
       {
         model: Product,
-        include: [
-          {
-            model: ProductCategory,
-            attributes: { exclude: ["createdAt", "updatedAt"] },
-          },
-        ],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+
+      {
+        model: ProductCategory,
         attributes: {
           exclude: [
             "createdAt",
@@ -256,8 +260,7 @@ const GetAllProducts = asyncWrapper(async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-
-  return res.status(200).json({ status: "ok", data, data2  });
+  return res.status(200).json({ status: "ok", data, data2 });
 });
 
 const GetProductById = asyncWrapper(async (req, res) => {
@@ -633,13 +636,11 @@ const approve = asyncWrapper(async (req, res) => {
     }
   }
 
-  return res
-    .status(200)
-    .json({
-      status: "success",
-      message: `succesffuly confirmed and  ${petitSales.amount} Debited on ${accountInfo.name} account`,
-      data: filteredData[0],
-    });
+  return res.status(200).json({
+    status: "success",
+    message: `succesffuly confirmed and  ${petitSales.amount} Debited on ${accountInfo.name} account`,
+    data: filteredData[0],
+  });
 });
 
 const sellsByWaiter = asyncWrapper(async (req, res) => {
