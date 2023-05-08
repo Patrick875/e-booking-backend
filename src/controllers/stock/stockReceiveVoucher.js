@@ -40,17 +40,6 @@ const create = asyncWrapper(async (req, res) => {
         where: { price: element.price, stockItemId: element.item_id },
       });
 
-      await StockItemTransaction.create({
-        stockItem: itemValue.stockItemId,
-        preQuantity: itemValue ? itemValue.quantity : 0,
-        newQuantity: element.quantity,
-        date : new Date(),
-        price : Number(element.price),
-        balance:
-          Number(itemValue ? itemValue.quantity : 0) +
-          Number(element.quantity),
-          status : "DEFAULT"
-      });
 
       if (!itemValue) {
         itemValue = await StockItemValue.create({
@@ -64,6 +53,19 @@ const create = asyncWrapper(async (req, res) => {
         });
         await itemValue.save();
       }
+
+      await StockItemTransaction.create({
+        stockItem: itemValue.stockItemId,
+        preQuantity: itemValue ? itemValue.quantity : 0,
+        newQuantity: element.quantity,
+        date : new Date(),
+        price : Number(element.price),
+        balance:
+          Number(itemValue ? itemValue.quantity : 0) +
+          Number(element.quantity),
+          status : "DEFAULT"
+      });
+
 
       let stockDetail = await StockReceiveVoucherDetail.create({
         stockItemId: element.item_id,
