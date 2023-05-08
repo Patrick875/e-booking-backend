@@ -30,7 +30,7 @@ const create = asyncWrapper(async (req, res) => {
     date: new Date(),
     userId: user.id,
     stockPurchaseOrderId: stockPurchaseOrderId,
-    receiveVOucherID: `RV_${await generateId(StockReceiveVoucher)}`,
+    receiveVOucherID: `RV_${await generateId(StockPurchaseOrder)}`,
     total,
   });
 

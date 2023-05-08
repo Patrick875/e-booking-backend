@@ -9,7 +9,7 @@ import {
   PetitStockSaleDetail,
   PetitStockItem,
   Account,
-  CashFlow
+  CashFlow,
 } from "../../models";
 import { printThermal } from "../../utils/HardPrint";
 import generateId from "../../utils/generateChonologicId";
@@ -131,6 +131,62 @@ const UpdateProduct = asyncWrapper(async (req, res) => {
     .json({ status: "success", message: "Product updated successfully" });
 });
 
+const UpdateProductPackage = asyncWrapper(async (req, res) => {
+  if (!req.body.product_id) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Product not found" });
+  }
+
+  if (!req.body.package_id) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Package not found" });
+  }
+
+  if (!req.body.price) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Price not found" });
+  }
+
+  const product = Product.findByPk(req.body.product_id, {
+    include: [{ model: Package, where: { id: req.body.package_id } }],
+  });
+  if (!product)
+    return res
+      .status(404)
+      .json({ status: "error", message: "We dont have that sccociation product and package" });
+
+      const productPackage = await product.getPackages({ where: { id: req.body.package_id } });
+      await productPackage[0].ProductPackage.update({ price: req.body.price });
+
+  const data = await Product.findByPk(product.id, {
+    include: [
+      {
+        model: Package,
+        include: [
+          {
+            model: ProductCategory,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+      },
+    ],
+  });
+
+  product.set({
+    name: req.body.name ? req.body.name : product.name,
+  });
+
+  await product.save();
+
+  return res
+    .status(200)
+    .json({ status: "success", message: "Product updated successfully", data });
+});
+
 const DeleteProduct = asyncWrapper(async (req, res) => {
   if (!req.params.id || isNaN(req.params.id)) {
     return res
@@ -175,15 +231,33 @@ const GetAllProducts = asyncWrapper(async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-
-  const data2 = data.forEach(element => {
-    return element;
-    
+  let data2 = await Package.findAll({
+    order: [["id", "DESC"]],
+    include: [
+      {
+        model: Product,
+        include: [
+          {
+            model: ProductCategory,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "PackageId",
+            "ProductId",
+            "categoryId",
+          ],
+        },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-  console.log(data);
 
-  return res.status(200).json({ status: "ok", data : data });
+  return res.status(200).json({ status: "ok", data, data2  });
 });
 
 const GetProductById = asyncWrapper(async (req, res) => {
@@ -291,9 +365,9 @@ const sell = asyncWrapper(async (req, res) => {
     ],
   });
 
-    if(data) {
-     await printThermal(data, 'EPSON')
-    }
+  if (data) {
+    await printThermal(data, "EPSON");
+  }
 
   return res
     .status(200)
@@ -301,7 +375,6 @@ const sell = asyncWrapper(async (req, res) => {
 });
 
 const allSalles = asyncWrapper(async (req, res) => {
-
   const data = await PetitStockSale.findAll({
     include: [
       {
@@ -401,12 +474,7 @@ const allSalles = asyncWrapper(async (req, res) => {
     .json({ status: "success", data: filteredData, message: "All sales" });
 });
 
-
-
-
 const approve = asyncWrapper(async (req, res) => {
-
-
   if (!req.body.id) {
     return res.status(400).json({ status: "error", message: "Id is required" });
   }
@@ -423,38 +491,31 @@ const approve = asyncWrapper(async (req, res) => {
   petitSales.set({ status: "COMFIRMED" });
   await petitSales.save();
 
-    const { account, amount, description, doneTo } = req.body;
+  const { account, amount, description, doneTo } = req.body;
 
-  
-    let accountInfo = await Account.findOne({ where: { name: 'CASH' } });
-  
-    if (
-      !accountInfo 
-    ) {
-      accountInfo = await Account.create({ name: 'CASH' , balance : 0 });
-    }
-  
-    const cash_flow = await CashFlow.create({
-      prevBalance: accountInfo.balance,
-      newBalance: Number(accountInfo.balance) + Number(petitSales.amount),
-      date: new Date(),
-      description : `Payment of sales completed, Id: ${petitSales.id} ` ,
-      amount: Number(petitSales.amount),
-      account: "CASH",
-      accountType: "DEBIT",
-      doneBy: req.user.id,
-      doneTo : req.user.id,
-      status: "SUCCESS",
-    });
-  
-    if (cash_flow) {
-      accountInfo.set({ balance : cash_flow.newBalance });
-      await accountInfo.save();
+  let accountInfo = await Account.findOne({ where: { name: "CASH" } });
 
-    }
-  
+  if (!accountInfo) {
+    accountInfo = await Account.create({ name: "CASH", balance: 0 });
+  }
 
+  const cash_flow = await CashFlow.create({
+    prevBalance: accountInfo.balance,
+    newBalance: Number(accountInfo.balance) + Number(petitSales.amount),
+    date: new Date(),
+    description: `Payment of sales completed, Id: ${petitSales.id} `,
+    amount: Number(petitSales.amount),
+    account: "CASH",
+    accountType: "DEBIT",
+    doneBy: req.user.id,
+    doneTo: req.user.id,
+    status: "SUCCESS",
+  });
 
+  if (cash_flow) {
+    accountInfo.set({ balance: cash_flow.newBalance });
+    await accountInfo.save();
+  }
 
   const data = await PetitStockSale.findAll({
     include: [
@@ -494,9 +555,9 @@ const approve = asyncWrapper(async (req, res) => {
       },
     ],
     attributes: { exclude: ["createdAt", "updatedAt"] },
-    where : {
-      id : req.body.id
-    }
+    where: {
+      id: req.body.id,
+    },
   });
 
   let newData = [];
@@ -553,37 +614,47 @@ const approve = asyncWrapper(async (req, res) => {
     };
   });
 
+  for (let itemsTodeduct of filteredData[0].petitStockSaleDetails) {
+    for (let item of itemsTodeduct.Package.Products.ProductPackage.items) {
+      let petitStock = await PetitStockItem.findOne({
+        where: {
+          itemId: item.itemId,
+          petitstockId: filteredData[0].petiStockId,
+        },
+      });
 
-  for(let itemsTodeduct of filteredData[0].petitStockSaleDetails){
-
-    for ( let item of itemsTodeduct.Package.Products.ProductPackage.items){
-
-      let petitStock = await PetitStockItem.findOne({ where :{ itemId : item.itemId, petitstockId : filteredData[0].petiStockId }});
-
-
-      if( petitStock ){
-        petitStock.set( { quantinty : petitStock.quantinty - item.quantity * itemsTodeduct.quantity })
+      if (petitStock) {
+        petitStock.set({
+          quantinty:
+            petitStock.quantinty - item.quantity * itemsTodeduct.quantity,
+        });
         petitStock.save();
       }
     }
-
   }
-
 
   return res
     .status(200)
-    .json({ status: "success", message: `succesffuly confirmed and  ${petitSales.amount} Debited on ${accountInfo.name} account`, data : filteredData[0],  });
+    .json({
+      status: "success",
+      message: `succesffuly confirmed and  ${petitSales.amount} Debited on ${accountInfo.name} account`,
+      data: filteredData[0],
+    });
 });
 
+const sellsByWaiter = asyncWrapper(async (req, res) => {
+  const { id } = req.params;
 
-const sellsByWaiter = asyncWrapper ( async( req, res ) => {
-
-  const { id } = req.params ;
-
-  if(!id) return res.status(400).json( {status: 'error', message : ' Waiter Id is required'} );
+  if (!id)
+    return res
+      .status(400)
+      .json({ status: "error", message: " Waiter Id is required" });
   const waiter = await User.findByPk(id);
 
-  if( !waiter ) return res.status(404).json({status : 'error', message: 'No User/Waiter found'})
+  if (!waiter)
+    return res
+      .status(404)
+      .json({ status: "error", message: "No User/Waiter found" });
 
   const data = await PetitStockSale.findAll({
     include: [
@@ -611,8 +682,8 @@ const sellsByWaiter = asyncWrapper ( async( req, res ) => {
       },
       {
         model: User,
-        where : {
-          id : waiter.id
+        where: {
+          id: waiter.id,
         },
         attributes: {
           exclude: [
@@ -685,15 +756,16 @@ const sellsByWaiter = asyncWrapper ( async( req, res ) => {
   return res
     .status(200)
     .json({ status: "success", data: filteredData, message: "All sales" });
-} )
+});
 export default {
   CreateProduct,
   UpdateProduct,
+  UpdateProductPackage,
   DeleteProduct,
   GetAllProducts,
   GetProductById,
   sell,
   allSalles,
   approve,
-  sellsByWaiter
+  sellsByWaiter,
 };
