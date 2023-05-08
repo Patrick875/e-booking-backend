@@ -231,12 +231,33 @@ const GetAllProducts = asyncWrapper(async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-  // const data2 = data.forEach((element) => {
-  //   return element;
-  // });
+  let data2 = await Package.findAll({
+    order: [["id", "DESC"]],
+    include: [
+      {
+        model: Product,
+        include: [
+          {
+            model: ProductCategory,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+          },
+        ],
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "PackageId",
+            "ProductId",
+            "categoryId",
+          ],
+        },
+      },
+    ],
+    attributes: { exclude: ["createdAt", "updatedAt"] },
+  });
 
 
-  return res.status(200).json({ status: "ok", data: data });
+  return res.status(200).json({ status: "ok", data, data2  });
 });
 
 const GetProductById = asyncWrapper(async (req, res) => {
