@@ -160,11 +160,22 @@ const UpdateProductPackage = asyncWrapper(async (req, res) => {
         status: "error",
         message: "We dont have that sccociation product and package",
       });
+      
+const productPackage1 = await product.getProductPackages({ where: { PackageId: req.body.package_id } });
 
-  const productPackage = await product.getPackages({
-    where: { id: req.body.package_id },
-  });
-  await productPackage[0].ProductPackage.update({ price: req.body.price });
+if (productPackage1.length > 0) {
+  // Update the price of the first matching package
+  const packageToUpdate = productPackage1[0];
+  packageToUpdate.price = req.body.price;
+  await packageToUpdate.save();
+}
+
+
+
+  // const productPackage = await product.getPackages({
+  //   where: { id: req.body.package_id },
+  // });
+  // await productPackage[0].ProductPackage.update({ price: req.body.price });
 
   const data = await Product.findByPk(product.id, {
     include: [
