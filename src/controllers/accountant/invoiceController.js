@@ -61,7 +61,6 @@ const create = asyncWrapper(async (req, res) => {
       model: InvoiceDetail,
       attributes: { exclude: ["createdAt", "updatedAt"] },
     },
-    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
   return res.status(200).json({
@@ -89,7 +88,6 @@ const index = asyncWrapper(async (req, res) => {
         ],
       },
     },],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
   return res.status(200).json({ status: "success", data });
@@ -140,7 +138,6 @@ const show = asyncWrapper(async (req, res) => {
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
-    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
   return res.status(200).json({ status: "Ok", data });

@@ -68,8 +68,6 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
         model: DeliveryNoteDetail,
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-
     });
   
     return res.status(200).json({ status: "success", data });
@@ -90,9 +88,8 @@ import { DeliveryNote, DeliveryNoteDetail} from "../../models";
           model: DeliveryNoteDetail,
           attributes: { exclude: ["createdAt", "updatedAt"] },
         },
-      ],
-      attributes: { exclude: ["createdAt", "updatedAt"] },
-    });
+      ]
+     });
   
     if (!delivery)
       return res.status(404).json({
