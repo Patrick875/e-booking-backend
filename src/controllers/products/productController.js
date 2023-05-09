@@ -150,7 +150,7 @@ const UpdateProductPackage = asyncWrapper(async (req, res) => {
       .json({ status: "error", message: "Price not found" });
   }
 
-  const product = Product.findByPk(req.body.product_id, {
+  const product = await Product.findByPk(req.body.product_id, {
     include: [{ model: Package, where: { id: req.body.package_id } }],
   });
   if (!product)
