@@ -45,7 +45,7 @@ const handleLogin = asyncWrapper(async (req, res) => {
         user,
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "120m" }
+      { expiresIn: "1d" }
     );
 
     const refreshToken = jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET, {
