@@ -128,7 +128,7 @@ const approve = asyncWrapper(async (req, res) => {
       message: "The request is required",
     });
 
-  let petitStock = await PetitStockRequesition.findByPk(request, {
+  let petitStockRequest = await PetitStockRequesition.findByPk(request, {
     include: [
       {
         model: PetitStockRequesitionDetail,
@@ -138,32 +138,53 @@ const approve = asyncWrapper(async (req, res) => {
     attributes: { exclude: ["createdAt", "updatedAt"] },
   });
 
-  if (!petitStock)
+  if (!petitStockRequest)
     return res.status(404).json({
       status: "error",
       message: "The request related to this Id not found",
     });
 
-  petitStock = petitStock.toJSON();
+    if(petitStockRequest.status === "APPROVED"){
+      return res.status(406).json({status: "error" , message : " you can't approve the request more than once"});
+    }
+    
+  petitStockRequest = petitStockRequest.toJSON();
 
-  for (let element of petitStock.PetitStockRequesitionDetails) {
+  for (let element of petitStockRequest.PetitStockRequesitionDetails) {
     let item = await StockItemValue.findByPk(element.itemValueId, {
       include: [{ model: StockItem }],
     });
 
-    const petitStockItem = await PetitStockItem.findOne({
+
+    let stockItem =  await StockItemValue.findByPk(item.id);
+
+    if(stockItem.quantity < element.quantity){
+      return res.status(402).json({ status: "error", message: " No sufficient stock balance for  " + item?.StockItem.name })
+    }
+    
+    
+  }
+
+
+  for (let element of petitStockRequest.PetitStockRequesitionDetails) {
+    let item = await StockItemValue.findByPk(element.itemValueId, {
+      include: [{ model: StockItem }],
+    });
+
+    let petitStockItem = await PetitStockItem.findOne({
       where: {
         itemId: item.toJSON().StockItem.id,
-        petitstockId: petitStock.petitStockId,
+        petitstockId: petitStockRequest.petitStockId,
       },
     });
+
 
     if (petitStockItem) {
 
       petitStockItem.set({
         quantinty:
           Number(
-            !petitStockItem.toJSON().quantinty
+            petitStockItem.toJSON().quantinty
               ? petitStockItem.toJSON().quantinty
               : 0
           ) + Number(element.quantity),
@@ -171,19 +192,18 @@ const approve = asyncWrapper(async (req, res) => {
       });
       await petitStockItem.save();
     } else {
-      
-      await PetitStockItem.create({
+      petitStockItem  = await PetitStockItem.create({
         quantinty: Number(element.quantity),
         itemId: item.StockItem.id,
-        petitstockId: petitStock.petitStockId,
+        petitstockId: petitStockRequest.petitStockId,
         avgPrice: Number(element.quantity) * Number(item.price),
       });
     }
 
 
+    // return res.status(200).json({ status: 'success', petitStockItem, element, item, petitStockRequest })
 
-    let stockItem =  await StockItemValue.findByPk(element.id);
-    
+    let stockItem =  await StockItemValue.findByPk(item.id);
     
     if(stockItem){
       stockItem.set({quantity : Number(stockItem.quantity) - Number(element.quantity)})
@@ -198,7 +218,7 @@ const approve = asyncWrapper(async (req, res) => {
 
   return res
     .status(200)
-    .json({ status: "OK", message: "Request approved", data: petitStock });
+    .json({ status: "OK", message: "Request approved", data: petitStockRequest });
 });
 
 const show = asyncWrapper(async (req, res) => {
