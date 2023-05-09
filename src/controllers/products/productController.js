@@ -154,53 +154,36 @@ const UpdateProductPackage = asyncWrapper(async (req, res) => {
     include: [{ model: Package, where: { id: req.body.package_id } }],
   });
   if (!product)
-    return res
-      .status(404)
-      .json({
-        status: "error",
-        message: "We dont have that sccociation product and package",
-      });
-      
-const productPackage1 = await product.getProductPackages({ where: { PackageId: req.body.package_id } });
+    return res.status(404).json({
+      status: "error",
+      message: "We dont have that sccociation product and package",
+    });
 
-if (productPackage1.length > 0) {
-  // Update the price of the first matching package
-  const packageToUpdate = productPackage1[0];
-  packageToUpdate.price = req.body.price;
-  await packageToUpdate.save();
-}
+  const productPackage = await ProductPackage.findOne({
+    where: { PackageId: req.body.package_id, ProductId: req.body.product_id },
+  });
 
+  if (productPackage) {
+    // Update the price of the first matching package
+    productPackage.set({price :req.body.price});
+    await productPackage.save();
+  }
 
 
-  // const productPackage = await product.getPackages({
-  //   where: { id: req.body.package_id },
-  // });
-  // await productPackage[0].ProductPackage.update({ price: req.body.price });
 
-  const data = await Product.findByPk(product.id, {
+  const data = await Product.findByPk(req.body.product_id, {
     include: [
       {
         model: Package,
-        include: [
-          {
-            model: ProductCategory,
-            attributes: { exclude: ["createdAt", "updatedAt"] },
-          },
-        ],
         attributes: { exclude: ["createdAt", "updatedAt"] },
       },
     ],
   });
 
-  product.set({
-    name: req.body.name ? req.body.name : product.name,
-  });
-
-  await product.save();
 
   return res
     .status(200)
-    .json({ status: "success", message: "Product updated successfully", data });
+    .json({ status: "success", message: "Product updated successfully", product });
 });
 
 const DeleteProduct = asyncWrapper(async (req, res) => {
