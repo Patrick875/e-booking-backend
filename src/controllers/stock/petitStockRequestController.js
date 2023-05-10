@@ -5,6 +5,7 @@ import {
   StockItemValue,
   PetitStockRequesitionDetail,
   PetitStockRequesition,
+  StockItemTransaction,
   User
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
@@ -199,6 +200,21 @@ const approve = asyncWrapper(async (req, res) => {
         avgPrice: Number(element.quantity) * Number(item.price),
       });
     }
+
+    // transact the grand stock
+
+      item &&  await StockItemTransaction.create({
+      stockItem: item.stockItemId,
+      preQuantity: item.quantity ,
+      newQuantity: element.quantity * -1,
+      date : new Date(),
+      price : Number(item.price),
+      balance:
+        Number(item.quantity) -
+        Number(element.quantity),
+        status : "REMOVED"
+    });
+
 
 
     // return res.status(200).json({ status: 'success', petitStockItem, element, item, petitStockRequest })
