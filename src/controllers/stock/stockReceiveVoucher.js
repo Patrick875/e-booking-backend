@@ -63,7 +63,7 @@ const create = asyncWrapper(async (req, res) => {
         balance:
           Number(itemValue ? itemValue.quantity : 0) +
           Number(element.quantity),
-          status : "DEFAULT"
+          status : "ADDED"
       });
 
 
