@@ -128,6 +128,7 @@ const cashFlows = asyncWrapper(async (req, res) => {
     include: [
       {
         model: User,
+        as : 'carrier',
         attributes: {
           exclude: [
             "createdAt",

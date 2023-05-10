@@ -1,27 +1,12 @@
-import { DailyMoney,DailyMoneyDetail, User } from "../../models";
+import { DailyMoney, DailyMoneyDetail, User } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const index = asyncWrapper(async (req, res) => {
-
   const data = await DailyMoney.findAll({
     include: [
       {
         model: User,
-        as : 'receiver',
-        attributes: {
-          exclude: [
-            "createdAt",
-            "updatedAt",
-            "refreshToken",
-            "password",
-            "verifiedAT",
-          ],
-        },
-      },
-
-      {
-        model: User,
-        as : 'carrier',
+        as: "receiver",
         attributes: {
           exclude: [
             "createdAt",
@@ -38,6 +23,7 @@ const index = asyncWrapper(async (req, res) => {
         include: [
           {
             model: User,
+            as: "carrier",
             attributes: {
               exclude: [
                 "createdAt",
@@ -49,12 +35,10 @@ const index = asyncWrapper(async (req, res) => {
             },
           },
         ],
-        attributes : {exclude: ["createdAt", "updatedAt"]},
-
+        attributes: { exclude: ["updatedAt"] },
       },
     ],
-            attributes : {exclude: ["createdAt", "updatedAt"]},
-
+    attributes: { exclude: ["createdAt", "updatedAt"] },
   });
   return res.status(200).json({ staus: "ok", data });
 });
@@ -91,12 +75,15 @@ const create = asyncWrapper(async (req, res) => {
       });
     }
 
-    if(!await User.findByPk(carriedBy)){
-      return res.status(404).json({status: 'error', message: ` User with ID ${carriedBy} not found` })
+    if (!(await User.findByPk(carriedBy))) {
+      return res
+        .status(404)
+        .json({
+          status: "error",
+          message: ` User with ID ${carriedBy} not found`,
+        });
     }
   }
-
-
 
   if (!totals) {
     return res
@@ -111,30 +98,17 @@ const create = asyncWrapper(async (req, res) => {
   });
 
   for (let element of data) {
-   let dailysalesDetails =  await DailyMoneyDetail.create({ ...element, dailysalesId: dailysales.id });
-
-   console.log(dailysalesDetails);
-   console.log( ' === ===== ===')
+    let dailysalesDetails = await DailyMoneyDetail.create({
+      ...element,
+      dailysalesId: dailysales.id,
+    });
   }
 
   const result = await DailyMoney.findAll({
     include: [
       {
         model: User,
-        as: 'receiver',
-        attributes: {
-          exclude: [
-            "createdAt",
-            "updatedAt",
-            "refreshToken",
-            "password",
-            "verifiedAT",
-          ],
-        },
-      },
-      {
-        model: User,
-        as: 'carrier',
+        as: "receiver",
         attributes: {
           exclude: [
             "createdAt",
@@ -150,8 +124,8 @@ const create = asyncWrapper(async (req, res) => {
         include: [
           {
             model: User,
-            as : 'carrier',
-            attributes : {
+            as: "carrier",
+            attributes: {
               exclude: [
                 "createdAt",
                 "updatedAt",
@@ -162,8 +136,7 @@ const create = asyncWrapper(async (req, res) => {
             },
           },
         ],
-        attributes : { exclude: ["createdAt", "updatedAt"] },
-
+        attributes: { exclude: ["updatedAt"] },
       },
     ],
   });
@@ -188,4 +161,71 @@ const destroy = asyncWrapper(async (req, res) => {
     .status(200)
     .json({ staus: "success", message: "Successfully deleted record" });
 });
-export default { create, index, update, destroy };
+
+const addDetail = asyncWrapper(async (req, res) => {
+  const { id, data } = req.body;
+
+  const dailysales = await DailyMoney.findByPk(id);
+
+  if (!dailysales) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "No Dailysales found" });
+  }
+  let totals = dailysales.totals;
+
+  if (totals.hasOwnProperty(data.currency)) {
+    dailysales.totals[data.currency] += data.amount;
+
+  } else {
+    dailysales.totals[data.currency] = data.amount;
+  }
+  dailysales.save();
+
+  let dailysalesDetails = await DailyMoneyDetail.create({
+    ...data,
+    dailysalesId: id,
+  });
+
+  const result = await DailyMoney.findByPk(id, {
+    include: [
+      {
+        model: User,
+        as: "receiver",
+        attributes: {
+          exclude: [
+            "createdAt",
+            "updatedAt",
+            "refreshToken",
+            "password",
+            "verifiedAT",
+          ],
+        },
+      },
+      {
+        model: DailyMoneyDetail,
+        include: [
+          {
+            model: User,
+            as: "carrier",
+            attributes: {
+              exclude: [
+                "createdAt",
+                "updatedAt",
+                "refreshToken",
+                "password",
+                "verifiedAT",
+              ],
+            },
+          },
+        ],
+        attributes: { exclude: ["updatedAt"] },
+      },
+    ],
+  });
+
+  return res
+    .status(200)
+    .json({ status: "success", message: "ok", data: result });
+});
+export default { create, index, update, destroy, addDetail };
