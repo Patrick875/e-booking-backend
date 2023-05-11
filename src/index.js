@@ -18,6 +18,7 @@ import serviceCategoryRouter from './routes/api/serviceCategory';
 import serviceRouter from './routes/api/services';
 import packagesRouter from './routes/api/packages';
 import stockItemRoutter from './routes/api/stockItems';
+import storeRouter from './routes/api/stores';
 import stockItemTrackRoutter from './routes/api/stockItems_transaction';
 import hallRouter  from './routes/api/halls';
 import hallService from './routes/api/hallServices'
@@ -90,6 +91,7 @@ app.use('/api/v1/services/category', serviceCategoryRouter);
 app.use('/api/v1/services', serviceRouter);
 app.use('/api/v1/packages', packagesRouter);
 app.use('/api/v1/stock/item', stockItemRoutter);
+app.use('/api/v1/stock/store', storeRouter);
 app.use('/api/v1/stock/track/item', stockItemTrackRoutter);
 app.use('/api/v1/hall/services', hallService);
 app.use('/api/v1/purchase/order', purchaseOrderRoutes);

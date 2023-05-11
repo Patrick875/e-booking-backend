@@ -1,6 +1,6 @@
 import {
   StockPurchaseOrder,
-  StockItem,
+  StockItemNew,
   StockItemValue,
   StockReceiveVoucher,
   StockPurchaseOrderDetail,
@@ -95,7 +95,7 @@ const index = asyncWrapper(async (req, res) => {
             attributes: { exclude: ["createdAt", "updatedAt"] },
             include: [
               {
-                model: StockItem,
+                model: StockItemNew,
                 order: [["createdAt", "DESC"]],
                 attributes: { exclude: ["createdAt", "updatedAt"] },
               },
@@ -107,7 +107,7 @@ const index = asyncWrapper(async (req, res) => {
         model: StockReceiveVoucherDetail,
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             order: [["id", "DESC"]],
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
@@ -155,7 +155,7 @@ const trackItemTransaction = asyncWrapper(async (req, res) => {
       .status(400)
       .json({ status: "error", message: "Stock Item is required" });
   }
-  const stockItem = await StockItem.findByPk(stockItemId);
+  const stockItem = await StockItemNew.findByPk(stockItemId);
 
   if (!stockItem) {
     return res
@@ -169,7 +169,7 @@ const trackItemTransaction = asyncWrapper(async (req, res) => {
         where: { stockItemId: stockItem },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],

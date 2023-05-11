@@ -2,7 +2,7 @@ import {
   StockPurchaseOrder,
   StockItemValue,
   StockPurchaseOrderDetail,
-  StockItem,
+  StockItemNew,
   User
 } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
@@ -65,7 +65,7 @@ const index = asyncWrapper(async (req, res) => {
         },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],
@@ -102,7 +102,7 @@ const show = asyncWrapper(async (req, res) => {
         attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],
@@ -169,7 +169,7 @@ const getApproved = asyncWrapper(async (req, res) => {
         },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],
@@ -199,7 +199,7 @@ const getNotApproved = asyncWrapper(async (req, res) => {
         },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],
@@ -235,7 +235,7 @@ const approve = asyncWrapper(async (req, res) => {
         },
         include: [
           {
-            model: StockItem,
+            model: StockItemNew,
             attributes: { exclude: ["createdAt", "updatedAt"] },
           },
         ],
