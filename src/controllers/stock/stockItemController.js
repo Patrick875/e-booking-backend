@@ -2,12 +2,18 @@ import {
   StockItemNew,
   StockItemValue,
   StockItemTransaction,
+  Store,
 } from "../../models";
 import { Op } from "sequelize";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const CreateItem = asyncWrapper(async (req, res) => {
   const name = req.body.name;
+  const storeId = req.body.storeId;
+  if(!storeId){
+    return res.status(400).json({status: 'success', message: 'storeId is required'})
+  }
+
   if (!req.body.name)
     return res.status(400).json({ message: "Name is required" });
 
@@ -16,6 +22,12 @@ const CreateItem = asyncWrapper(async (req, res) => {
       .status(409)
       .json({ status: "error", message: `${name} is already saved` });
   }
+
+  const store = await Store.findByPk(storeId);
+  if (!store){
+    return res.status(404).json({status: 'error' , message: " Store Not found" });
+  }
+
 
   const stock_item = await StockItemNew.create(req.body);
   return res
