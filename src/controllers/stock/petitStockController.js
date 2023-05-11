@@ -1,4 +1,4 @@
-import { PetitStock, PetitStockItem, StockItem } from "../../models";
+import { PetitStock, PetitStockItem, StockItemNew } from "../../models";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
 const index = asyncWrapper(async (req, res) => {
@@ -7,7 +7,7 @@ const index = asyncWrapper(async (req, res) => {
       {
         model: PetitStockItem,
         include: [
-          { model: StockItem,
+          { model: StockItemNew,
           attributes: { exclude: ["createdAt", "updatedAt"] }},
         ],
         attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -96,7 +96,7 @@ const disActivatePetitStock = asyncWrapper(async (req, res) => {
 const balance = asyncWrapper(async (req, res) => {
   const data = await PetitStockItem.findAll({
     include: [
-      { model: StockItem, attributes: { exclude: ["createdAt", "updatedAt"] } },
+      { model: StockItemNew, attributes: { exclude: ["createdAt", "updatedAt"] } },
       {
         model: PetitStock,
         attributes: { exclude: ["createdAt", "updatedAt"] },

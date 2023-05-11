@@ -1,59 +1,61 @@
 import {
+  Store,
   StockItemNew,
   StockItemValue,
   StockItemTransaction,
-  Store,
 } from "../../models";
 import { Op } from "sequelize";
 import { asyncWrapper } from "../../utils/handlingTryCatchBlocks";
 
-const CreateItem = asyncWrapper(async (req, res) => {
+const create = asyncWrapper(async (req, res) => {
   const name = req.body.name;
-  const storeId = req.body.storeId;
-  if(!storeId){
-    return res.status(400).json({status: 'success', message: 'storeId is required'})
-  }
-
   if (!req.body.name)
     return res.status(400).json({ message: "Name is required" });
 
-  if (await StockItemNew.findOne({ where: { name } })) {
+  if (await Store.findOne({ where: { name } })) {
     return res
       .status(409)
       .json({ status: "error", message: `${name} is already saved` });
   }
 
-  const store = await Store.findByPk(storeId);
-  if (!store){
-    return res.status(404).json({status: 'error' , message: " Store Not found" });
-  }
-
-
-  const stock_item = await StockItemNew.create(req.body);
+  const store = await Store.create(req.body);
   return res
     .status(201)
-    .json({ status: `ok`, message: "Item created", data: stock_item });
+    .json({ status: `ok`, message: "Item created", data: store });
 });
 
-const GetItem = asyncWrapper(async (req, res) => {
+const show = asyncWrapper(async (req, res) => {
   if (!req.params.id)
     return res.status(400).json({
       status: `error`,
-      message: "Item Id required and should be a number ",
+      message: "Stre Id required and should be a number ",
     });
-  const item = await StockItemNew.findByPk(req.params.id);
-  if (!item) {
+  const store = await Store.findByPk(req.params.id, {
+    include: [{
+      model: StockItemNew,
+      include: [{
+        model: StockItemValue
+      }]
+    }]
+  });
+  if (!store) {
     return res.status(404).json({ status: "error", message: "Item not found" });
   }
-  return res.status(200).json({ status: "success", data: item });
+  return res.status(200).json({ status: "success", data: store });
 });
 
-const GetItems = asyncWrapper(async (req, res) => {
-  const items = await StockItemNew.findAll({
+const index = asyncWrapper(async (req, res) => {
+  const items = await Store.findAll({
     include: [
       {
-        model: StockItemValue,
-        attributes: { exclude: ["createdAt", "updatedAt", "stockItemId"] },
+        model: StockItemNew,
+        include: [
+          {
+            model: StockItemValue,
+            attributes: { exclude: ["updatedAt", "stockItemId"] },
+          },
+        ],
+        attributes: { exclude: [ "updatedAt", "stockItemId"] },
       },
     ],
     order: [["id", "DESC"]],
@@ -61,52 +63,39 @@ const GetItems = asyncWrapper(async (req, res) => {
   return res.status(200).json({ status: "ok", data: items });
 });
 
-const UpdateItem = asyncWrapper(async (req, res) => {
+const update = asyncWrapper(async (req, res) => {
   if (!req.body.id) return res.status(400).json({ message: "id is required " });
 
-  const stock_item = await StockItemNew.findByPk(req.body.id);
+  const store = await Store.findByPk(req.body.id);
 
-  if (!stock_item)
+  if (!store)
     return res.status(404).json({ message: "stock item not found " });
 
-  stock_item.set(req.body);
-  stock_item.save();
+  store.set(req.body);
+  store.save();
   return res.status(200).json({
     status: `ok`,
-    message: " Stock Item updated successfully",
-    data: stock_item,
+    message: " Store updated successfully",
+    data: store,
   });
 });
 
-const DeleteItem = asyncWrapper(async (req, res) => {
+const destroy = asyncWrapper(async (req, res) => {
   if (!req.params.id)
     return res.status(400).json({ message: "id is required " });
-  const stock_item = await StockItemNew.findByPk(req.params.id);
-  if (!stock_item) return res.status(404).json({ message: " Item not found" });
-  await stock_item.destroy();
+  const store = await Store.findByPk(req.params.id);
+  if (!store) return res.status(404).json({ message: " Store not found" });
+  await store.destroy();
   return res
     .status(200)
-    .json({ status: `ok`, message: " Item deleted successfully" });
-});
-
-const stockBalance = asyncWrapper(async (req, res) => {
-  const data = await StockItemValue.findAll({
-    include: [
-      { model: StockItemNew, attributes: { exclude: ["createdAt", "updatedAt"] } },
-    ],
-    attributes: { exclude: ["createdAt", "updatedAt", "stockItemId"] },
-  });
-
-  return res
-    .status(200)
-    .json({ status: "success", message: "stock balance", data });
+    .json({ status: `ok`, message: " Store deleted successfully" });
 });
 
 const trackItemTransaction = asyncWrapper( async (req, res) => {
 
   const { item, date_from, date_to } = req.query;
   if(item) {
-    const row = await StockItemNew.findByPk(item);
+    const row = await Store.findByPk(item);
     if(!row) return res.status(404).json({ status: 'error', message: 'stock item not found' });
   }
 
@@ -158,11 +147,10 @@ const trackItemTransaction = asyncWrapper( async (req, res) => {
 
 
 export default {
-  CreateItem,
-  GetItem,
-  GetItems,
-  UpdateItem,
-  DeleteItem,
-  stockBalance,
+  create,
+  show,
+  index,
+  update,
+  destroy,
   trackItemTransaction,
 };

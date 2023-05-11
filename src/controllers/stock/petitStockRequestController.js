@@ -1,7 +1,7 @@
 import {
   PetitStock,
   PetitStockItem,
-  StockItem,
+  StockItemNew,
   StockItemValue,
   PetitStockRequesitionDetail,
   PetitStockRequesition,
@@ -23,7 +23,7 @@ const create = asyncWrapper(async (req, res) => {
 
   for (let dataElement of data) {
     let item = await StockItemValue.findByPk(dataElement.itemValueId, {
-      include: [{ model: StockItem }],
+      include: [{ model: StockItemNew }],
     });
 
     if (!item) {
@@ -88,7 +88,7 @@ const index = asyncWrapper(async (req, res) => {
           {
             model: StockItemValue,
             include: {
-              model: StockItem,
+              model: StockItemNew,
               attributes: { exclude: ["createdAt", "updatedAt"] },
             },
             attributes: {
@@ -153,14 +153,14 @@ const approve = asyncWrapper(async (req, res) => {
 
   for (let element of petitStockRequest.PetitStockRequesitionDetails) {
     let item = await StockItemValue.findByPk(element.itemValueId, {
-      include: [{ model: StockItem }],
+      include: [{ model: StockItemNew }],
     });
 
 
     let stockItem =  await StockItemValue.findByPk(item.id);
 
     if(stockItem.quantity < element.quantity){
-      return res.status(402).json({ status: "error", message: " No sufficient stock balance for  " + item?.StockItem.name })
+      return res.status(402).json({ status: "error", message: " No sufficient stock balance for  " + item?.StockItemNew.name })
     }
     
     
@@ -169,12 +169,12 @@ const approve = asyncWrapper(async (req, res) => {
 
   for (let element of petitStockRequest.PetitStockRequesitionDetails) {
     let item = await StockItemValue.findByPk(element.itemValueId, {
-      include: [{ model: StockItem }],
+      include: [{ model: StockItemNew }],
     });
 
     let petitStockItem = await PetitStockItem.findOne({
       where: {
-        itemId: item.toJSON().StockItem.id,
+        itemId: item.toJSON().StockItemNew.id,
         petitstockId: petitStockRequest.petitStockId,
       },
     });
@@ -195,7 +195,7 @@ const approve = asyncWrapper(async (req, res) => {
     } else {
       petitStockItem  = await PetitStockItem.create({
         quantinty: Number(element.quantity),
-        itemId: item.StockItem.id,
+        itemId: item.StockItemNew.id,
         petitstockId: petitStockRequest.petitStockId,
         avgPrice: Number(element.quantity) * Number(item.price),
       });
@@ -252,7 +252,7 @@ const show = asyncWrapper(async (req, res) => {
           {
             model: StockItemValue,
             include: {
-              model: StockItem,
+              model: StockItemNew,
               attributes: { exclude: ["createdAt", "updatedAt"] },
             },
             attributes: {
