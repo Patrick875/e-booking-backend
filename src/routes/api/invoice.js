@@ -6,6 +6,7 @@ const routes = express.Router();
 routes.post("/add", invoiceController.create);
 routes.get("/all", invoiceController.index);
 routes.post("/approve", invoiceController.approve);
+routes.post("/payment", invoiceController.payment);
 routes.get("/:id", invoiceController.show);
 routes.delete("/delete/:id", invoiceController.destroy);
 

@@ -11,6 +11,7 @@ router.route("/delete/:id").delete(usersController.deleteUser);
 router.route("/update").put(usersController.updateUser);
 router.route("/:id").get(usersController.getUser);
 router.route("/disactivate/:id").get(usersController.disactivate);
+router.route("/reactivate/:id").get(usersController.reactivate);
 router.route("/change-password").post(usersController.changePassword);
 
 module.exports = router;
